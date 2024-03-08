@@ -5,5 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
+import SideMenu from '@/components/SideMenu.vue';
+import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
+
 </script>
