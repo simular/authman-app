@@ -1,3 +1,4 @@
+import { isLogin } from '@/store/main-store';
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
@@ -30,5 +31,7 @@ const app = createApp(App)
 router.isReady().then(() => {
   app.mount('#app');
 
-  router.replace('/auth/login');
+  if (!isLogin.value) {
+    router.replace('/auth/login');
+  }
 });

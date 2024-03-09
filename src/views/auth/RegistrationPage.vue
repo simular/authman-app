@@ -1,49 +1,45 @@
 <script setup lang="ts">
+
+import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
-import useLoading from '@/utilities/loading';
 import { IonPage, IonContent, IonButton, IonInput, IonSpinner, useIonRouter } from '@ionic/vue';
-import logo from '@/assets/images/logo-sq-w.svg';
+import useLoading from '@/utilities/loading';
 import { SRPClient } from '@windwalker-io/srp';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 const router = useIonRouter();
-const email = ref(import.meta.env.VITE_TEST_USERNAME || '');
-const password = ref(import.meta.env.VITE_TEST_PASSWORD || '');
+const email = ref('');
+const password = ref('');
 const { loading, run } = useLoading();
 
-// let viGenerating = Promise.resolve();
-//
-// watch(email, () => {
-//
-// });
-//
-// function generateVerifier() {
-//   const client = SRPClient.create();
-//
-//   client.register(email.value, password.value);
-// }
+async function register() {
+  const client = SRPClient.create();
+  client.setHasher('sha256');
 
-async function authenticate() {
-  const auth = btoa(`${email.value}:${password.value}`);
+  const res = await run(async () => {
+    const { salt, verifier } = await client.register(email.value, password.value);
 
-  const res = await run(() => apiClient.get<{
-    data: {
-      user: User;
-      accessToken: string;
-      refreshToken: string;
-    }
-  }>(
-    'auth/authenticate',
-    {
-      headers: {
-        Authorization: `Basic ${auth}`
+    return await apiClient.post<{
+      data: {
+        user: User;
+        accessToken: string;
+        refreshToken: string;
       }
-    }
-  ));
+    }>(
+      'auth/register',
+      {
+        email: email.value,
+        salt: salt.toString(16),
+        verifier: verifier.toString(16)
+      }
+    )
+  });
 
-  const { user, accessToken, refreshToken } = res.data.data;
+  const data = res.data.data;
+
+  const { user, accessToken, refreshToken } = data;
 
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
@@ -64,14 +60,16 @@ async function authenticate() {
           <img :src="logo" alt="logo" style="width: 175px; aspect-ratio: 1">
         </div>
 
-        <h3 style="margin-bottom: 1.5rem">Sign In</h3>
+        <h3 style="margin-bottom: 1.5rem">
+          Create a new account
+        </h3>
 
         <div style="width: 100%; display: grid; gap: 1rem;">
           <ion-input label="Email"
             type="email"
             fill="solid"
             label-placement="stacked"
-            placeholder="xxx@xxx.xx"
+            placeholder=""
             autocomplete="email"
             v-model="email"
           >
@@ -81,27 +79,27 @@ async function authenticate() {
             type="password"
             fill="solid"
             label-placement="stacked"
-            placeholder="**********"
+            placeholder=""
             v-model="password"
           >
           </ion-input>
 
-          <ion-button expand="block" @click="authenticate"
+          <ion-button expand="block" @click="register"
             :disabled="loading">
             <template v-if="!loading">
-              Login
+              Sign Up
             </template>
             <template v-else>
               <ion-spinner name="dots" />
             </template>
           </ion-button>
 
-          <ion-button expand="block" fill="clear"
-            :disabled="loading"
-            router-link="/auth/registration"
-          >
-            Create an account
-          </ion-button>
+          <div class="ion-text-center">
+            Have an account?
+            <router-link to="login">
+              Sign in Now
+            </router-link>
+          </div>
         </div>
       </div>
     </ion-content>
