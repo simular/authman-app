@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
 import useLoading from '@/utilities/loading';
-import { IonPage, IonContent, IonButton, IonInput, IonSpinner, useIonRouter } from '@ionic/vue';
-import logo from '@/assets/images/logo-sq-w.svg';
-import { SRPClient } from '@windwalker-io/srp';
-import { ref, watch } from 'vue';
+import { IonButton, IonContent, IonInput, IonPage, IonSpinner, useIonRouter } from '@ionic/vue';
+import { hexToBigint, SRPClient } from '@windwalker-io/srp';
+import { ref } from 'vue';
 
 const router = useIonRouter();
 const email = ref(import.meta.env.VITE_TEST_USERNAME || '');
@@ -25,23 +25,66 @@ const { loading, run } = useLoading();
 //   client.register(email.value, password.value);
 // }
 
-async function authenticate() {
-  const auth = btoa(`${email.value}:${password.value}`);
-
-  const res = await run(() => apiClient.get<{
+async function challenge() {
+  const res = await apiClient.post<{
     data: {
-      user: User;
-      accessToken: string;
-      refreshToken: string;
+      salt: string;
+      B: string;
+      sess: string;
     }
   }>(
-    'auth/authenticate',
+    'auth/challenge',
     {
-      headers: {
-        Authorization: `Basic ${auth}`
+      email: email.value,
+    },
+  );
+
+  return res.data.data;
+}
+
+async function authenticate() {
+  const res = await run(async () => {
+    const srpClient = SRPClient.create();
+
+    const challengeResult = await challenge();
+
+    const salt = hexToBigint(challengeResult.salt);
+    const B = hexToBigint(challengeResult.B);
+    const sess = challengeResult.sess;
+
+    const { secret: a, public: A, hash: x } = await srpClient.step1(
+      email.value,
+      password.value,
+      salt
+    );
+
+    const { key: K, proof: M1 } = await srpClient.step2(email.value,
+      salt,
+      A,
+      a,
+      B,
+      x,
+    );
+
+    return apiClient.post<{
+      data: {
+        user: User;
+        accessToken: string;
+        refreshToken: string;
       }
-    }
-  ));
+    }>(
+      'auth/authenticate',
+      {
+        email: email.value,
+        A: A.toString(16),
+        M1: M1.toString(16),
+        sess,
+      },
+      {
+        _noAuth: true,
+      },
+    );
+  });
 
   const { user, accessToken, refreshToken } = res.data.data;
 

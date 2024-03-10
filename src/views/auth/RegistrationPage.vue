@@ -4,7 +4,15 @@ import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
-import { IonPage, IonContent, IonButton, IonInput, IonSpinner, useIonRouter } from '@ionic/vue';
+import {
+  IonPage,
+  IonContent,
+  IonButton,
+  IonInput,
+  IonSpinner,
+  useIonRouter,
+  toastController,
+} from '@ionic/vue';
 import useLoading from '@/utilities/loading';
 import { SRPClient } from '@windwalker-io/srp';
 import { ref } from 'vue';
@@ -16,7 +24,6 @@ const { loading, run } = useLoading();
 
 async function register() {
   const client = SRPClient.create();
-  client.setHasher('sha256');
 
   const res = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
@@ -44,6 +51,13 @@ async function register() {
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
   refreshTokenStorage.value = refreshToken;
+
+  const toast = await toastController.create({
+    message: 'Your account created.',
+    position: 'top',
+    duration: 3000,
+  });
+  toast.present();
 
   router.replace({
     name: 'accounts',
