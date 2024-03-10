@@ -27,6 +27,7 @@ async function register() {
 
   const res = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
+    const A = await client.generatePublic(await client.generateRandomSecret());
 
     return await apiClient.post<{
       data: {
@@ -39,7 +40,8 @@ async function register() {
       {
         email: email.value,
         salt: salt.toString(16),
-        verifier: verifier.toString(16)
+        verifier: verifier.toString(16),
+        A: A.toString(16),
       }
     )
   });
