@@ -2,6 +2,7 @@
 
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
+import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
 import {
@@ -14,7 +15,8 @@ import {
   toastController,
 } from '@ionic/vue';
 import useLoading from '@/utilities/loading';
-import { SRPClient } from '@windwalker-io/srp';
+import { SRPClient, SRPServer } from '@windwalker-io/srp';
+import { uint8ToHex } from 'bigint-toolkit';
 import { ref } from 'vue';
 
 const router = useIonRouter();
@@ -24,12 +26,17 @@ const { loading, run } = useLoading();
 
 async function register() {
   const client = SRPClient.create();
+  const server = SRPServer.create();
 
   const res = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
-    const A = await client.generatePublic(await client.generateRandomSecret());
+    const { public: A, secret: a, hash: x } = await client.step1(email.value, password.value, salt);
+    const { public: B, secret: b } = await server.step1(email.value, salt, verifier);
+    const { preMasterSecret: S, proof: M1 } = await client.step2(email.value, salt, A, a, B, x);
 
-    return await apiClient.post<{
+    const enc = encryptionService.encrypt(password.value, '724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed');
+
+    return apiClient.post<{
       data: {
         user: User;
         accessToken: string;
@@ -42,8 +49,9 @@ async function register() {
         salt: salt.toString(16),
         verifier: verifier.toString(16),
         A: A.toString(16),
+        enc,
       }
-    )
+    );
   });
 
   const data = res.data.data;
