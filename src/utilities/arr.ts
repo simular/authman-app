@@ -6,9 +6,11 @@ export function concatUnit8(...items: Uint8Array[]) {
   );
 
   const result = new Uint8Array(length);
+  let len = 0;
 
   for (const item of items) {
-    result.set(item);
+    result.set(item, len);
+    len += item.length;
   }
 
   return result;

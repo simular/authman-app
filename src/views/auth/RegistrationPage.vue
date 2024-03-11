@@ -16,7 +16,8 @@ import {
 } from '@ionic/vue';
 import useLoading from '@/utilities/loading';
 import { SRPClient, SRPServer } from '@windwalker-io/srp';
-import { uint8ToHex } from 'bigint-toolkit';
+import { bigintToUint8, bufferToUint8, uint8ToHex } from 'bigint-toolkit';
+import sodium from 'libsodium-wrappers';
 import { ref } from 'vue';
 
 const router = useIonRouter();
@@ -34,7 +35,11 @@ async function register() {
     const { public: B, secret: b } = await server.step1(email.value, salt, verifier);
     const { preMasterSecret: S, proof: M1 } = await client.step2(email.value, salt, A, a, B, x);
 
-    const enc = encryptionService.encrypt(password.value, '724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed');
+    const pk = await encryptionService.deriveEncKey(
+      new TextEncoder().encode(password.value)
+    );
+    console.log(S, S.toString(16));
+    const enc = await encryptionService.encrypt('1234', sodium.from_hex(S.toString(16)));
 
     return apiClient.post<{
       data: {
@@ -49,7 +54,8 @@ async function register() {
         salt: salt.toString(16),
         verifier: verifier.toString(16),
         A: A.toString(16),
-        enc,
+        pk: uint8ToHex(enc),
+        M1: M1.toString(16),
       }
     );
   });
