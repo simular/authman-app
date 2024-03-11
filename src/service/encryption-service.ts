@@ -21,6 +21,9 @@ export default new class EncryptionService {
     return concatUnit8(nonce, salt, enc);
   }
 
+  /**
+   * Key Derivation Function (KDF)
+   */
   async deriveEncKey(originKey: Uint8Array, salt?: Uint8Array) {
     const baseKey = await window.crypto.subtle.importKey(
       'raw',

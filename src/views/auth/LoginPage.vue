@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
+import authService from '@/service/auth-service';
 import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
@@ -16,87 +17,16 @@ const email = ref(import.meta.env.VITE_TEST_USERNAME || '');
 const password = ref(import.meta.env.VITE_TEST_PASSWORD || '');
 const { loading, run } = useLoading();
 
-// let viGenerating = Promise.resolve();
-//
-// watch(email, () => {
-//
-// });
-//
-// function generateVerifier() {
-//   const client = SRPClient.create();
-//
-//   client.register(email.value, password.value);
-// }
-
-async function challenge() {
-  const res = await apiClient.post(
-    'auth/challenge',
-    {
-      email: email.value,
-    },
-  );
-
-  return res.data.data as {
-    salt: string;
-    B: string;
-    sess: string;
-    requirePK: boolean;
-  };
-}
-
 async function authenticate() {
   const res = await run(async () => {
-    const srpClient = SRPClient.create();
+    const { salt, B, sess } = await authService.challenge(email.value);
 
-    const challengeResult = await challenge();
-
-    const salt = hexToBigint(challengeResult.salt);
-    const B = hexToBigint(challengeResult.B);
-    const sess = challengeResult.sess;
-    const requirePK = challengeResult.requirePK;
-
-    const { secret: a, public: A, hash: x } = await srpClient.step1(
+    return authService.authenticate(
       email.value,
       password.value,
-      salt
-    );
-
-    const { key: K, proof: M1, preMasterSecret: S } = await srpClient.step2(email.value,
-      salt,
-      A,
-      a,
-      B,
-      x,
-    );
-
-    let encPK;
-
-    if (requirePK) {
-      const pk = await encryptionService.deriveEncKey(
-        new TextEncoder().encode(password.value)
-      );
-
-      encPK = uint8ToHex(await encryptionService.encrypt(pk, sodium.from_hex(S.toString(16))));
-    }
-
-    return apiClient.post<{
-      data: {
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-      }
-    }>(
-      'auth/authenticate',
-      {
-        email: email.value,
-        A: A.toString(16),
-        M1: M1.toString(16),
-        sess,
-        encPK
-      },
-      {
-        _noAuth: true,
-      },
+      sess,
+      hexToBigint(salt),
+      hexToBigint(B)
     );
   });
 

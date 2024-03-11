@@ -2,8 +2,11 @@
 
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
+import authService from '@/service/auth-service';
+import { deriveEncKey, sodiumCipher } from '@/service/cipher';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
+import { text2uint8 } from '@/utilities/convert';
 import {
   IonPage,
   IonContent,
@@ -14,7 +17,9 @@ import {
   toastController,
 } from '@ionic/vue';
 import useLoading from '@/utilities/loading';
-import { SRPClient, SRPServer } from '@windwalker-io/srp';
+import { hexToBigint, SRPClient, SRPServer } from '@windwalker-io/srp';
+import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
+import sodium from 'libsodium-wrappers';
 import { ref } from 'vue';
 
 const router = useIonRouter();
@@ -28,7 +33,15 @@ async function register() {
   const res = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
 
-    return apiClient.post<{
+    const secretKey = sodium.randombytes_buf(16);
+    const masterKey = sodium.randombytes_buf(32);
+    const secretHex = uint8ToHex(secretKey);
+    const kek = await deriveEncKey(text2uint8(password.value));
+
+    const encSecret = await sodiumCipher.encrypt(secretKey, kek);
+    const encMaster = await sodiumCipher.encrypt(masterKey, secretKey);
+
+    const regRes = await apiClient.post<{
       data: {
         user: User;
         accessToken: string;
@@ -40,8 +53,11 @@ async function register() {
         email: email.value,
         salt: salt.toString(16),
         verifier: verifier.toString(16),
+        encSecret: uint8ToHex(encSecret)
       }
     );
+
+    return login(encSecret, encMaster);
   });
 
   const data = res.data.data;
@@ -61,6 +77,30 @@ async function register() {
 
   router.replace({
     name: 'accounts',
+  });
+}
+
+async function login(encSecret: Uint8Array, encMaster: Uint8Array) {
+  const { salt, B, sess } = await authService.challenge(email.value);
+
+  const { A, M1, S } = await authService.runSRPLoginSteps(
+    email.value,
+    password.value,
+    hexToBigint(salt),
+    hexToBigint(B)
+  );
+  const uintS = bigintToUint8(S);
+
+  encSecret = await sodiumCipher.encrypt(encSecret, uintS);
+  encMaster = await sodiumCipher.encrypt(encMaster, uintS);
+  console.log(encSecret, encMaster);
+  return authService.authenticatePost({
+    email: email.value,
+    A: A.toString(16),
+    M1: M1.toString(16),
+    sess,
+    encSecret: uint8ToHex(encSecret),
+    encMaster: uint8ToHex(encMaster),
   });
 }
 
