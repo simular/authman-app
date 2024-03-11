@@ -2,7 +2,6 @@
 
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
-import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
 import {
@@ -16,8 +15,6 @@ import {
 } from '@ionic/vue';
 import useLoading from '@/utilities/loading';
 import { SRPClient, SRPServer } from '@windwalker-io/srp';
-import { bigintToUint8, bufferToUint8, uint8ToHex } from 'bigint-toolkit';
-import sodium from 'libsodium-wrappers';
 import { ref } from 'vue';
 
 const router = useIonRouter();
@@ -27,19 +24,9 @@ const { loading, run } = useLoading();
 
 async function register() {
   const client = SRPClient.create();
-  const server = SRPServer.create();
 
   const res = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
-    const { public: A, secret: a, hash: x } = await client.step1(email.value, password.value, salt);
-    const { public: B, secret: b } = await server.step1(email.value, salt, verifier);
-    const { preMasterSecret: S, proof: M1 } = await client.step2(email.value, salt, A, a, B, x);
-
-    const pk = await encryptionService.deriveEncKey(
-      new TextEncoder().encode(password.value)
-    );
-    console.log(S, S.toString(16));
-    const enc = await encryptionService.encrypt('1234', sodium.from_hex(S.toString(16)));
 
     return apiClient.post<{
       data: {
@@ -53,9 +40,6 @@ async function register() {
         email: email.value,
         salt: salt.toString(16),
         verifier: verifier.toString(16),
-        A: A.toString(16),
-        pk: uint8ToHex(enc),
-        M1: M1.toString(16),
       }
     );
   });
