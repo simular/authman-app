@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo-sq-w.svg';
-import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
-import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
-import { User } from '@/types';
 import useLoading from '@/utilities/loading';
 import { IonButton, IonContent, IonInput, IonPage, IonSpinner, useIonRouter } from '@ionic/vue';
-import { hexToBigint, SRPClient } from '@windwalker-io/srp';
-import { uint8ToHex } from 'bigint-toolkit';
-import sodium from 'libsodium-wrappers';
+import { hexToBigint } from '@windwalker-io/srp';
 import { ref } from 'vue';
 
 const router = useIonRouter();
