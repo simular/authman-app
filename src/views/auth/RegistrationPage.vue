@@ -3,7 +3,8 @@
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
-import { derivePbkdf2, sodiumCipher } from '@/service/cipher';
+import { sodiumCipher } from '@/service/cipher';
+import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
 import { text2uint8 } from '@/utilities/convert';
@@ -36,7 +37,7 @@ async function register() {
     const secretKey = sodium.randombytes_buf(16);
     const masterKey = sodium.randombytes_buf(32);
     const secretHex = uint8ToHex(secretKey);
-    const kek = await derivePbkdf2(text2uint8(password.value));
+    const kek = await encryptionService.deriveEncKey(text2uint8(password.value), bigintToUint8(salt));
 
     const encSecret = await sodiumCipher.encrypt(secretKey, kek);
     const encMaster = await sodiumCipher.encrypt(masterKey, secretKey);
@@ -53,7 +54,6 @@ async function register() {
         email: email.value,
         salt: salt.toString(16),
         verifier: verifier.toString(16),
-        encSecret: uint8ToHex(encSecret)
       }
     );
 

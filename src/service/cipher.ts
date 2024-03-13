@@ -1,20 +1,24 @@
 import { concatUnit8 } from '@/utilities/arr';
-import { wrapUint8 } from '@/utilities/convert';
+import { uint82text, wrapUint8 } from '@/utilities/convert';
+import { hashHkdf, hashPbkdf2 } from '@/utilities/crypto';
+import { uint8ToHex } from 'bigint-toolkit';
 import sodium from 'libsodium-wrappers';
 
-export const PBKDF_ITERATION_TIMES = 500000;
-export const SALT_LENGTH = 16;
-
 class SodiumCipher {
+  NONCE_SIZE = sodium.crypto_secretbox_NONCEBYTES;
+  SALT_SIZE = 16;
+  HKDF_SIZE = 32;
+  HMAC_SIZE = 64;
+
   async encrypt(str: Uint8Array | string, key: Uint8Array | string) {
     str = wrapUint8(str);
     key = wrapUint8(key);
 
-    const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-    const salt = sodium.randombytes_buf(SALT_LENGTH);
+    const nonce = sodium.randombytes_buf(this.NONCE_SIZE);
+    const salt = sodium.randombytes_buf(this.SALT_SIZE);
 
-    const encKey = await deriveHkdf(key, 32, 'Enc', salt);
-    const hmacKey = await deriveHkdf(key, 32, 'Auth', salt);
+    const encKey = await this.deriveHkdf(key, 'Enc', salt);
+    const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
 
     const enc = sodium.crypto_secretbox_easy(str, nonce, encKey);
 
@@ -28,87 +32,19 @@ class SodiumCipher {
     key: Uint8Array | string
   ) {
     return sodium.crypto_generichash(
-      64,
+      this.HMAC_SIZE,
       message,
       key
     );
   }
+
+  deriveHkdf(
+    key: Uint8Array | string,
+    info: Uint8Array | string = '',
+    salt: Uint8Array | string = ''
+  ) {
+    return hashHkdf('SHA-256', key, this.HKDF_SIZE, info, salt);
+  }
 }
 
 export const sodiumCipher = new SodiumCipher();
-
-/**
- * PBKDF
- */
-export async function derivePbkdf2(
-  password: Uint8Array | string,
-  salt: Uint8Array | string = '',
-  iterations = 100000
-) {
-  password = wrapUint8(password);
-  salt = wrapUint8(salt);
-
-  const baseKey = await window.crypto.subtle.importKey(
-    'raw',
-    password,
-    'PBKDF2',
-    false,
-    ['deriveBits', 'deriveKey',]
-  );
-
-  const ck = await window.crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      hash: 'SHA-256',
-      iterations,
-      salt: salt || sodium.randombytes_buf(32)
-    },
-    baseKey,
-    256,
-  );
-
-  return new Uint8Array(ck);
-}
-
-export async function deriveHkdf(
-  key: Uint8Array | string,
-  length = 0,
-  info: Uint8Array | string = '',
-  salt: Uint8Array | string = ''
-) {
-  key = wrapUint8(key);
-  info = wrapUint8(info);
-  salt = wrapUint8(salt);
-
-  const baseKey = await window.crypto.subtle.importKey(
-    'raw',
-    key,
-    'HKDF',
-    false,
-    ['deriveBits', 'deriveKey',]
-  );
-
-  const ck = await window.crypto.subtle.deriveBits(
-    {
-      name: 'HKDF',
-      hash: 'SHA-256',
-      info,
-      salt: salt || sodium.randombytes_buf(32)
-    },
-    baseKey,
-    length * 8,
-  );
-
-  return new Uint8Array(ck);
-}
-
-export async function hmac(
-  message: Uint8Array | string,
-  key: Uint8Array | string
-) {
-  return sodium.crypto_generichash(
-    64,
-    message,
-    key
-  );
-}
