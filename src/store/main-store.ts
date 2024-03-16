@@ -12,3 +12,6 @@ export const accessTokenStorage = useLocalStorage('@authman:access.token', '');
 export const refreshTokenStorage = useLocalStorage('@authman:refresh.token', '');
 export const userStorage = useLocalStorage<User | undefined>('@authman:user', undefined);
 export const isLogin = computed(() => accessTokenStorage.value !== '');
+
+export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
+export const encMasterStorage = useLocalStorage('@authman:enc.master', '');

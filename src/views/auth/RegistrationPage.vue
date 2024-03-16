@@ -7,7 +7,7 @@ import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
 import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import { User } from '@/types';
-import { text2uint8 } from '@/utilities/convert';
+import { base64UrlDecode, base64UrlEncode, text2uint8, uint82text } from '@/utilities/convert';
 import {
   IonPage,
   IonContent,
@@ -57,7 +57,7 @@ async function register() {
       }
     );
 
-    return login(encSecret, encMaster);
+    return authService.login(email.value, password.value);
   });
 
   const data = res.data.data;
@@ -77,30 +77,6 @@ async function register() {
 
   router.replace({
     name: 'accounts',
-  });
-}
-
-async function login(encSecret: Uint8Array, encMaster: Uint8Array) {
-  const { salt, B, sess } = await authService.challenge(email.value);
-
-  const { A, M1, S } = await authService.runSRPLoginSteps(
-    email.value,
-    password.value,
-    hexToBigint(salt),
-    hexToBigint(B)
-  );
-  const uintS = bigintToUint8(S);
-
-  encSecret = await sodiumCipher.encrypt(encSecret, uintS);
-  encMaster = await sodiumCipher.encrypt(encMaster, uintS);
-  console.log(encSecret, encMaster);
-  return authService.authenticatePost({
-    email: email.value,
-    A: A.toString(16),
-    M1: M1.toString(16),
-    sess,
-    encSecret: uint8ToHex(encSecret),
-    encMaster: uint8ToHex(encMaster),
   });
 }
 

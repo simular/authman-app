@@ -5,10 +5,13 @@ import { uint8ToHex } from 'bigint-toolkit';
 import sodium from 'libsodium-wrappers';
 
 class SodiumCipher {
-  NONCE_SIZE = sodium.crypto_secretbox_NONCEBYTES;
   SALT_SIZE = 16;
   HKDF_SIZE = 32;
   HMAC_SIZE = 64;
+
+  get NONCE_SIZE() {
+    return sodium.crypto_secretbox_NONCEBYTES
+  }
 
   async encrypt(str: Uint8Array | string, key: Uint8Array | string) {
     str = wrapUint8(str);
@@ -44,6 +47,15 @@ class SodiumCipher {
     salt: Uint8Array | string = ''
   ) {
     return hashHkdf('SHA-256', key, this.HKDF_SIZE, info, salt);
+  }
+}
+
+class SignatureCipher {
+  seal(str: Uint8Array | string, key: Uint8Array | string) {
+    str = wrapUint8(str);
+    key = wrapUint8(key);
+
+    return sodium.crypto_box_seal(str, key);
   }
 }
 
