@@ -13,7 +13,7 @@ const password = ref(import.meta.env.VITE_TEST_PASSWORD || '');
 const { loading, run } = useLoading();
 
 async function authenticate() {
-  const res = await run(async () => {
+  const result = await run(async () => {
     const { salt, B, sess } = await authService.challenge(email.value);
 
     return authService.authenticate(
@@ -25,7 +25,7 @@ async function authenticate() {
     );
   });
 
-  const { user, accessToken, refreshToken } = res.data.data;
+  const { user, accessToken, refreshToken } = result;
 
   userStorage.value = user;
   accessTokenStorage.value = accessToken;

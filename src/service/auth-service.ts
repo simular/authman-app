@@ -82,7 +82,7 @@ export default new class AuthService {
 
     const secretKey = sodium.randombytes_buf(16);
     const masterKey = sodium.randombytes_buf(32);
-    const kek = await encryptionService.deriveEncKey(text2uint8(password), bigintToUint8(salt));
+    const kek = await encryptionService.deriveKek(text2uint8(password), bigintToUint8(salt));
 
     const encSecret = await sodiumCipher.encrypt(secretKey, kek);
     const encMaster = await sodiumCipher.encrypt(masterKey, secretKey);

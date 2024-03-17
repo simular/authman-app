@@ -31,18 +31,10 @@ const { loading, run } = useLoading();
 async function register() {
   const client = SRPClient.create();
 
-  const res = await run(async () => {
+  const result = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
 
-    const secretKey = sodium.randombytes_buf(16);
-    const masterKey = sodium.randombytes_buf(32);
-    const secretHex = uint8ToHex(secretKey);
-    const kek = await encryptionService.deriveEncKey(text2uint8(password.value), bigintToUint8(salt));
-
-    const encSecret = await sodiumCipher.encrypt(secretKey, kek);
-    const encMaster = await sodiumCipher.encrypt(masterKey, secretKey);
-
-    const regRes = await apiClient.post<{
+    await apiClient.post<{
       data: {
         user: User;
         accessToken: string;
@@ -60,9 +52,7 @@ async function register() {
     return authService.login(email.value, password.value);
   });
 
-  const data = res.data.data;
-
-  const { user, accessToken, refreshToken } = data;
+  const { user, accessToken, refreshToken } = result;
 
   userStorage.value = user;
   accessTokenStorage.value = accessToken;

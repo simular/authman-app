@@ -50,13 +50,4 @@ class SodiumCipher {
   }
 }
 
-class SignatureCipher {
-  seal(str: Uint8Array | string, key: Uint8Array | string) {
-    str = wrapUint8(str);
-    key = wrapUint8(key);
-
-    return sodium.crypto_box_seal(str, key);
-  }
-}
-
 export const sodiumCipher = new SodiumCipher();
