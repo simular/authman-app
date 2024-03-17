@@ -1,9 +1,8 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import { encMasterStorage, encSecretStorage } from '@/store/main-store';
+import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
 import { User } from '@/types';
-import { text2uint8 } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { hexToBigint, SRPClient } from '@windwalker-io/srp';
 import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
@@ -53,43 +52,52 @@ export default new class AuthService {
   ) {
     const { A, M1, S } = await this.runSRPLoginSteps(email, password, salt, B);
 
-    let secrets: {
-      encSecret?: string;
-      encMaster?: string;
-    } = {};
-
-    if (firstLogin) {
-      secrets = await this.generateUserSecrets(password, S, salt);
-    }
-
-    const res = await this.authenticatePost({
+    const data: any = {
       email,
       A: A.toString(16),
       M1: M1.toString(16),
       sess,
-      ...secrets,
-    });
+    };
+
+    let kek: Uint8Array | undefined = undefined;
+
+    if (firstLogin) {
+      kek = await encryptionService.deriveKek(password, bigintToUint8(salt));
+
+      const {
+        encSecret,
+        encMaster
+      } = await this.generateUserSecrets(S, kek);
+
+      data.encSecret = uint8ToHex(encSecret);
+      data.encMaster = uint8ToHex(encMaster);
+    }
+
+    const res = await this.authenticatePost(data);
+
+    kekStorage.value = secretToolkit.encode(
+      kek = kek || await encryptionService.deriveKek(password, bigintToUint8(salt)),
+      Encoder.HEX
+    );
 
     return res.data.data;
   }
 
   async generateUserSecrets(
-    password: string,
     S: bigint,
-    salt: bigint
+    kek: Uint8Array
   ) {
     const uintS = bigintToUint8(S);
 
     const secretKey = secretToolkit.genSecret(16, Encoder.HEX);
     const masterKey = secretToolkit.genSecret(16, Encoder.HEX);
-    const kek = await encryptionService.deriveKek(password, bigintToUint8(salt));
 
     const encSecret = await sodiumCipher.encrypt(secretKey, kek);
     const encMaster = await sodiumCipher.encrypt(masterKey, secretToolkit.decode(secretKey));
 
     return {
-      encSecret: uint8ToHex(await sodiumCipher.encrypt(encSecret, uintS)),
-      encMaster: uint8ToHex(await sodiumCipher.encrypt(encMaster, uintS)),
+      encSecret: await sodiumCipher.encrypt(encSecret, uintS),
+      encMaster: await sodiumCipher.encrypt(encMaster, uintS),
     };
   }
 

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo-sq-w.svg';
 import authService from '@/service/auth-service';
-import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
+import {
+  accessTokenStorage,
+  encMasterStorage,
+  encSecretStorage,
+  refreshTokenStorage,
+  userStorage
+} from '@/store/main-store';
 import useLoading from '@/utilities/loading';
 import { IonButton, IonContent, IonInput, IonPage, IonSpinner, useIonRouter } from '@ionic/vue';
 import { hexToBigint } from '@windwalker-io/srp';
@@ -25,11 +31,13 @@ async function authenticate() {
     );
   });
 
-  const { user, accessToken, refreshToken } = result;
+  const { user, accessToken, refreshToken, encSecret, encMaster } = result;
 
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
   refreshTokenStorage.value = refreshToken;
+  encSecretStorage.value = encSecret;
+  encMasterStorage.value = encMaster;
 
   router.replace({
     name: 'accounts',

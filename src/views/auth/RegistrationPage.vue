@@ -3,29 +3,22 @@
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
-import { sodiumCipher } from '@/service/cipher';
-import encryptionService from '@/service/encryption-service';
-import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
-import { User } from '@/types';
-import { base64UrlDecode, base64UrlEncode, text2uint8, uint82text } from '@/utilities/convert';
 import {
-  IonPage,
-  IonContent,
-  IonButton,
-  IonInput,
-  IonSpinner,
-  useIonRouter,
-  toastController,
-} from '@ionic/vue';
+  accessTokenStorage,
+  encMasterStorage,
+  encSecretStorage,
+  refreshTokenStorage,
+  userStorage
+} from '@/store/main-store';
+import { User } from '@/types';
 import useLoading from '@/utilities/loading';
-import { hexToBigint, SRPClient, SRPServer } from '@windwalker-io/srp';
-import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
-import sodium from 'libsodium-wrappers';
+import { IonButton, IonContent, IonInput, IonPage, IonSpinner, toastController, useIonRouter, } from '@ionic/vue';
+import { SRPClient } from '@windwalker-io/srp';
 import { ref } from 'vue';
 
 const router = useIonRouter();
-const email = ref('');
-const password = ref('');
+const email = ref('test@test.com');
+const password = ref('1234');
 const { loading, run } = useLoading();
 
 async function register() {
@@ -52,11 +45,13 @@ async function register() {
     return authService.login(email.value, password.value);
   });
 
-  const { user, accessToken, refreshToken } = result;
+  const { user, accessToken, refreshToken, encSecret, encMaster } = result;
 
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
   refreshTokenStorage.value = refreshToken;
+  encSecretStorage.value = encSecret;
+  encMasterStorage.value = encMaster;
 
   const toast = await toastController.create({
     message: 'Your account created.',

@@ -1,6 +1,7 @@
 import { concatUnit8 } from '@/utilities/arr';
 import { uint82text, wrapUint8 } from '@/utilities/convert';
 import { hashHkdf, hashPbkdf2 } from '@/utilities/crypto';
+import { timingSafeEquals } from '@windwalker-io/srp';
 import { uint8ToHex } from 'bigint-toolkit';
 import sodium from 'libsodium-wrappers';
 
@@ -28,6 +29,37 @@ class SodiumCipher {
     const hmac = await this.hmac(concatUnit8(nonce, salt, enc), hmacKey);
 
     return concatUnit8(nonce, salt, enc, hmac);
+  }
+
+  async decrypt(str: Uint8Array | string, key: Uint8Array | string) {
+    str = wrapUint8(str);
+    key = wrapUint8(key);
+
+    const nonce = str.slice(0, this.NONCE_SIZE);
+    const salt = str.slice(this.NONCE_SIZE, this.SALT_SIZE);
+    const encrypted = str.slice(
+      this.NONCE_SIZE + this.SALT_SIZE,
+      str.length - (this.NONCE_SIZE + this.SALT_SIZE + this.HMAC_SIZE)
+    );
+    const hmac = str.slice(str.length - this.HMAC_SIZE);
+
+    const encKey = await this.deriveHkdf(key, 'Enc', salt);
+    const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
+
+    sodium.memzero(str);
+
+    const calc = await this.hmac(concatUnit8(nonce, salt, encrypted), hmacKey);
+    console.log(calc, hmac);
+    if (!timingSafeEquals(uint8ToHex(calc), uint8ToHex(hmac))) {
+      throw new Error('\'Invalid message authentication code');
+    }
+
+    const plaintext = sodium.crypto_secretbox_open_easy(encrypted, nonce, encKey);
+
+    sodium.memzero(encrypted);
+    sodium.memzero(nonce);
+
+    return plaintext;
   }
 
   async hmac(
