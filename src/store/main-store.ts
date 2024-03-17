@@ -1,4 +1,4 @@
-import { User } from '@/types';
+import { Account, User } from '@/types';
 import { useLocalStorage } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
@@ -15,3 +15,5 @@ export const isLogin = computed(() => accessTokenStorage.value !== '');
 
 export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
 export const encMasterStorage = useLocalStorage('@authman:enc.master', '');
+
+export const accountsStorage = useLocalStorage<Account[]>('@authman:accounts', []);

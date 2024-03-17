@@ -56,3 +56,11 @@ function padString(input: string): string {
 
   return buffer.toString();
 }
+
+export async function blobToBase64Uri(blob: Blob): Promise<string> {
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+}
