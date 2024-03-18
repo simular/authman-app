@@ -1,3 +1,5 @@
+import { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers';
+
 export function text2uint8(str: string) {
   return new TextEncoder().encode(str);
 }
@@ -15,23 +17,11 @@ export function wrapUint8(val: Uint8Array | string) {
 }
 
 export function base64UrlEncode(str: Uint8Array | string) {
-  if (typeof str !== 'string') {
-    str = uint82text(str);
-  }
-
-  const base64 = btoa(str);
-
-  return base64
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+  return to_base64(str, base64_variants.URLSAFE);
 }
 
 export function base64UrlDecode(base64: string) {
-  return atob(
-    base64.replace(/-/g, "+")
-      .replace(/_/g, "/")
-  );
+  return from_base64(base64, base64_variants.URLSAFE);
 }
 
 function padString(input: string): string {

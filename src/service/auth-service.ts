@@ -6,6 +6,7 @@ import { User } from '@/types';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { hexToBigint, SRPClient } from '@windwalker-io/srp';
 import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
+import sodium, { to_base64 } from 'libsodium-wrappers';
 
 export default new class AuthService {
   async login(email: string, password: string) {
@@ -69,8 +70,8 @@ export default new class AuthService {
         encMaster
       } = await this.generateUserSecrets(S, kek);
 
-      data.encSecret = uint8ToHex(encSecret);
-      data.encMaster = uint8ToHex(encMaster);
+      data.encSecret = to_base64(encSecret);
+      data.encMaster = to_base64(encMaster);
     }
 
     const res = await this.authenticatePost(data);
@@ -89,11 +90,11 @@ export default new class AuthService {
   ) {
     const uintS = bigintToUint8(S);
 
-    const secretKey = secretToolkit.genSecret(16, Encoder.HEX);
-    const masterKey = secretToolkit.genSecret(16, Encoder.HEX);
+    const secretKey = sodium.randombytes_buf(16);
+    const masterKey = sodium.randombytes_buf(32);
 
     const encSecret = await sodiumCipher.encrypt(secretKey, kek);
-    const encMaster = await sodiumCipher.encrypt(masterKey, secretToolkit.decode(secretKey));
+    const encMaster = await sodiumCipher.encrypt(masterKey, secretKey);
 
     return {
       encSecret: await sodiumCipher.encrypt(encSecret, uintS),

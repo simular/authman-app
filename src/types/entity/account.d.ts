@@ -1,7 +1,7 @@
-export interface Account {
+export interface Account<T = AccountContent> {
   id: string;
   userId: string;
-  content: string;
+  content: T;
   created: string;
   modified: string;
   params: any;

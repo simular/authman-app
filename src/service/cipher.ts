@@ -15,12 +15,13 @@ class SodiumCipher {
   }
 
   async encrypt(str: Uint8Array | string, key: Uint8Array | string) {
+    await sodium.ready;
+
     str = wrapUint8(str);
     key = wrapUint8(key);
 
     const nonce = sodium.randombytes_buf(this.NONCE_SIZE);
     const salt = sodium.randombytes_buf(this.SALT_SIZE);
-
     const encKey = await this.deriveHkdf(key, 'Enc', salt);
     const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
 
@@ -32,16 +33,20 @@ class SodiumCipher {
   }
 
   async decrypt(str: Uint8Array | string, key: Uint8Array | string) {
+    await sodium.ready;
+
     str = wrapUint8(str);
     key = wrapUint8(key);
 
-    const nonce = str.slice(0, this.NONCE_SIZE);
-    const salt = str.slice(this.NONCE_SIZE, this.SALT_SIZE);
+    let current = 0;
+    const nonce = str.slice(0, current += this.NONCE_SIZE);
+    const salt = str.slice(current, current += this.SALT_SIZE);
     const encrypted = str.slice(
-      this.NONCE_SIZE + this.SALT_SIZE,
-      str.length - (this.NONCE_SIZE + this.SALT_SIZE + this.HMAC_SIZE)
+      current,
+      current += (str.length - (this.NONCE_SIZE + this.SALT_SIZE + this.HMAC_SIZE))
     );
-    const hmac = str.slice(str.length - this.HMAC_SIZE);
+
+    const hmac = str.slice(current);
 
     const encKey = await this.deriveHkdf(key, 'Enc', salt);
     const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
@@ -49,7 +54,7 @@ class SodiumCipher {
     sodium.memzero(str);
 
     const calc = await this.hmac(concatUnit8(nonce, salt, encrypted), hmacKey);
-    console.log(calc, hmac);
+
     if (!timingSafeEquals(uint8ToHex(calc), uint8ToHex(hmac))) {
       throw new Error('\'Invalid message authentication code');
     }
@@ -66,6 +71,8 @@ class SodiumCipher {
     message: Uint8Array | string,
     key: Uint8Array | string
   ) {
+    await sodium.ready;
+
     return sodium.crypto_generichash(
       this.HMAC_SIZE,
       message,

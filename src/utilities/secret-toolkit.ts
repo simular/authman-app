@@ -1,12 +1,6 @@
-import {
-  base64UrlDecode,
-  base64UrlEncode,
-  text2uint8,
-  uint82text,
-  wrapUint8,
-} from '@/utilities/convert';
+import { uint82text, wrapUint8, } from '@/utilities/convert';
 import { hexToUint8, uint8ToHex } from 'bigint-toolkit';
-import sodium from 'libsodium-wrappers';
+import sodium, { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers';
 
 export enum Encoder {
   HEX = 'hex',
@@ -33,7 +27,7 @@ export default new class {
     if (encoder === Encoder.HEX) {
       encoded = uint8ToHex(str);
     } else if (encoder === Encoder.BASE64URL) {
-      encoded = base64UrlEncode(str);
+      encoded = to_base64(str, base64_variants.URLSAFE_NO_PADDING);
     } else {
       throw new Error(`Unknown encoder: ${encoder}`);
     }
@@ -53,7 +47,7 @@ export default new class {
     }
 
     if (encoder === Encoder.BASE64URL) {
-      return text2uint8(base64UrlDecode(encoded));
+      return from_base64(str, base64_variants.URLSAFE_NO_PADDING);
     }
 
     throw new Error(`Unknown encoder: ${encoder}`);
