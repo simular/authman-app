@@ -1,0 +1,12 @@
+.box-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--clamp-lines, 2);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

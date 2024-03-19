@@ -1,26 +1,38 @@
 <template>
   <MainLayout>
-    <ion-card v-if="active">
-      <ion-card-content style="height: 300px">
-        <AccountToken :item="active" />
-      </ion-card-content>
-    </ion-card>
+    <ion-searchbar :animated="true" placeholder="Search" v-model="q"></ion-searchbar>
 
     <ion-grid>
       <ion-row>
         <ion-col size="6" size-md="4" size-lg="3"
           v-for="item of items" :key="item.id">
-          <ion-card>
+          <ion-card @click="selectAccount(item)"
+          style="margin: 0; height: 100%">
             <ion-card-content>
-              <div>
-                <img :src="item.content.icon" alt="img">
+              <div class="ion-text-center ion-padding">
+                <img :src="item.content.icon" alt="img" style="width: 56px; aspect-ratio: 1">
               </div>
-              <h4>{{ item.content.title }}</h4>
+              <div class="line-clamp">
+                <h4>{{ item.content.title }}</h4>
+              </div>
             </ion-card-content>
           </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-modal
+      class="account-modal"
+      :is-open="modalOpen"
+      @didDismiss="active = undefined"
+    >
+      <ion-content class="ion-padding" v-if="active"
+        :scroll-y="false">
+        <div class="box-center" style="height: 100%">
+          <AccountToken :item="active" />
+        </div>
+      </ion-content>
+    </ion-modal>
   </MainLayout>
 </template>
 
@@ -33,18 +45,35 @@ import { accountsStorage, encMasterStorage, encSecretStorage, kekStorage } from 
 import { Account, AccountContent } from '@/types';
 import { base64UrlDecode, uint82text } from '@/utilities/convert';
 import secretToolkit from '@/utilities/secret-toolkit';
-import { IonCard, IonCardContent, IonCol, IonGrid, IonRow } from '@ionic/vue';
+import { IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonModal, IonRow, IonSearchbar } from '@ionic/vue';
 import { computed, onMounted, ref } from 'vue';
 
-const items = computed(() => accountsStorage.value);
+const items = computed(() => {
+  let accounts = accountsStorage.value;
+
+  if (q.value === '') {
+    return accounts;
+  }
+
+  return accounts.filter((account) => {
+    const content = account.content;
+    const qi = q.value.toLowerCase();
+
+    if (content.title.toLowerCase().includes(qi)) {
+      return true;
+    }
+
+    if (content.url.toLowerCase().includes(qi)) {
+      return true;
+    }
+
+    return false;
+  });
+});
 const active = ref<Account>();
 
 onMounted(async () => {
   await loadAccounts();
-
-  if (!active.value) {
-    active.value = items.value[0];
-  }
 });
 
 async function loadAccounts() {
@@ -57,6 +86,7 @@ async function loadAccounts() {
   accountsStorage.value = await prepareAccounts(res.data.data.items);
 }
 
+// Prepare
 async function prepareAccounts(items: Account<string>[]): Promise<Account[]> {
   const kek = kekStorage.value;
   const secret = await sodiumCipher.decrypt(base64UrlDecode(encSecretStorage.value), secretToolkit.decode(kek));
@@ -77,4 +107,27 @@ async function prepareAccounts(items: Account<string>[]): Promise<Account[]> {
   return accounts;
 }
 
+// Select account
+const modalOpen = computed(() => active.value != undefined);
+
+function selectAccount(account: Account) {
+  active.value = account;
+}
+
+// Search
+const q = ref('');
+
 </script>
+
+<style scoped lang="scss">
+@media (max-width: 767px) or (max-height: 599px) {
+  ion-modal.account-modal {
+    --height: 400px;
+    --width: 85%;
+    --border-radius: 2px;
+    --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+    //--border-radius: 16px;
+    //--box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+}
+</style>

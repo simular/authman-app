@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TotpProgress from '@/components/TotpProgress.vue';
 import { Account, AccountContent } from '@/types';
 import { faCopy } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -6,9 +7,6 @@ import { IonButton } from '@ionic/vue';
 import { TOTP } from 'totp-generator';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import Popper from "vue3-popper";
-import "vue3-circle-progress/dist/circle-progress.css";
-// @ts-ignore
-import CircleProgress from "vue3-circle-progress";
 
 const props = defineProps<{
   item: Account;
@@ -65,6 +63,8 @@ function codeSplit(code: string) {
 const showCopied = ref(false);
 
 function codeButtonClick() {
+  navigator.clipboard.writeText(otp.value);
+
   showCopied.value = true;
 
   setTimeout(() => {
@@ -86,7 +86,7 @@ function round(num: number) {
 <template>
 <div>
   <div class="c-account-item" style="text-align: center" >
-    <img class="c-account-item__icon" :src="item.content.icon" alt="icon" style="height: 96px">
+    <img class="c-account-item__icon" :src="item.content.icon" alt="icon" style="height: 64px">
 
     <h2 class="c-account-item__title">{{ item.content.title }}</h2>
 
@@ -113,13 +113,11 @@ function round(num: number) {
       </Popper>
     </div>
 
-    <div class="c-account-item__left-time">
-      <CircleProgress :percent="progress" :size="48"
-        :border-width="3"
-        :border-bg-width="3"
-      >
+    <div class="c-account-item__left-time"
+      style="margin-top: .5rem">
+      <TotpProgress :progress :size="48" >
         {{ round(leftTime) }}
-      </CircleProgress>
+      </TotpProgress>
     </div>
 
   </div>
@@ -139,12 +137,8 @@ function round(num: number) {
   }
 
   &__left-time {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
-}
-
-.c-otp-button {
-  //--background: transparent;
 }
 
 .c-otp {
@@ -154,10 +148,6 @@ function round(num: number) {
   gap: .75rem;
   padding: 0 .75rem;
   cursor: pointer;
-
-  &:hover {
-    //background-color: var(--ion-color-dark);
-  }
 
   &__code {
     display: inline-block;
