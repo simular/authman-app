@@ -16,12 +16,12 @@ export function wrapUint8(val: Uint8Array | string) {
   return val;
 }
 
-export function base64UrlEncode(str: Uint8Array | string) {
-  return to_base64(str, base64_variants.URLSAFE);
+export function base64UrlEncode(str: Uint8Array | string, noPadding = false) {
+  return to_base64(str, noPadding ? base64_variants.URLSAFE_NO_PADDING : base64_variants.URLSAFE);
 }
 
-export function base64UrlDecode(base64: string) {
-  return from_base64(base64, base64_variants.URLSAFE);
+export function base64UrlDecode(base64: string, noPadding = false) {
+  return from_base64(base64, noPadding ? base64_variants.URLSAFE_NO_PADDING : base64_variants.URLSAFE);
 }
 
 function padString(input: string): string {

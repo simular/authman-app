@@ -1,11 +1,31 @@
 <template>
   <MainLayout>
-    <ExploreContainer name="Accounts" />
+    <ion-card v-if="active">
+      <ion-card-content style="height: 300px">
+        <AccountToken :item="active" />
+      </ion-card-content>
+    </ion-card>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" size-md="4" size-lg="3"
+          v-for="item of items" :key="item.id">
+          <ion-card>
+            <ion-card-content>
+              <div>
+                <img :src="item.content.icon" alt="img">
+              </div>
+              <h4>{{ item.content.title }}</h4>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </MainLayout>
 </template>
 
 <script setup lang="ts">
-import ExploreContainer from '@/components/ExploreContainer.vue';
+import AccountToken from '@/components/AccountToken.vue';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
@@ -13,12 +33,18 @@ import { accountsStorage, encMasterStorage, encSecretStorage, kekStorage } from 
 import { Account, AccountContent } from '@/types';
 import { base64UrlDecode, uint82text } from '@/utilities/convert';
 import secretToolkit from '@/utilities/secret-toolkit';
-import { computed, onMounted } from 'vue';
+import { IonCard, IonCardContent, IonCol, IonGrid, IonRow } from '@ionic/vue';
+import { computed, onMounted, ref } from 'vue';
 
 const items = computed(() => accountsStorage.value);
+const active = ref<Account>();
 
 onMounted(async () => {
-  loadAccounts();
+  await loadAccounts();
+
+  if (!active.value) {
+    active.value = items.value[0];
+  }
 });
 
 async function loadAccounts() {
@@ -47,7 +73,7 @@ async function prepareAccounts(items: Account<string>[]): Promise<Account[]> {
 
     accounts.push(account);
   }
-  console.log(accounts);
+
   return accounts;
 }
 
