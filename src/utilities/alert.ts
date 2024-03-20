@@ -1,4 +1,4 @@
-import { alertController } from '@ionic/vue';
+import { alertController, toastController, ToastOptions } from '@ionic/vue';
 
 export async function simpleAlert(title: any, text?: string, type = 'warning'): Promise<void> {
   if (title instanceof Error || title.message) {
@@ -52,4 +52,20 @@ export async function simpleConfirm(title: string, text?: string): Promise<boole
 
     alert.then((alert) => alert.present());
   });
+}
+
+export async function simpleToast(
+  message: string,
+  position: 'top' | 'bottom' | 'middle' = 'bottom',
+  duration = 1000,
+  options: ToastOptions = {}
+) {
+  const toast = await toastController.create({
+    ...options,
+    message,
+    position,
+    duration
+  });
+
+  return toast.present();
 }
