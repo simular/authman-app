@@ -14,7 +14,8 @@
       </ion-buttons>
     </template>
 
-    <ion-searchbar :animated="true" placeholder="Search" v-model="q"></ion-searchbar>
+    <ion-searchbar :animated="true" placeholder="Search" v-model="q"
+      autocapitalize="none"></ion-searchbar>
 
     <ion-grid>
       <ion-row>

@@ -10,7 +10,7 @@ export default defineConfig(({ mode}) => {
   return {
     plugins: [
       vue(),
-      legacy(),
+      // legacy(),
       showEnv([
         'VITE_API_ENDPOINT',
         'VITE_TEST_USERNAME',
