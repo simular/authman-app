@@ -1,5 +1,7 @@
 {
   "name": "authman-app",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "vue-vite"
 }
