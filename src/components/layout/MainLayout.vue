@@ -17,19 +17,23 @@ defineProps<{
 
 <template>
   <ion-page>
-    <ion-header class="py-0 px-3">
+    <ion-header class="">
       <ion-toolbar>
-        <ion-buttons slot="start" class="m-0">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
+        <div slot="start">
+          <slot name="start">
+            <ion-buttons>
+              <ion-menu-button></ion-menu-button>
+            </ion-buttons>
+          </slot>
+        </div>
 
         <ion-title class="text-center">{{ title }}</ion-title>
 
-        <slot name="end" slot="end" class="m-0">
-          <ion-buttons>
-            <ion-menu-button></ion-menu-button>
-          </ion-buttons>
-        </slot>
+        <div slot="end">
+          <slot name="end">
+
+          </slot>
+        </div>
       </ion-toolbar>
     </ion-header>
 
