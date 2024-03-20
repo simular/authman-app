@@ -12,21 +12,21 @@ import {
   IonToolbar,
   modalController,
 } from '@ionic/vue';
-import { inject, nextTick, ref } from 'vue';
+import { ComputedRef, inject, nextTick, ref } from 'vue';
 
 defineProps<{
   title?: string;
 }>();
 
-const nav: any = inject('nav');
+const nav = inject<ComputedRef<HTMLIonNavElement>>('nav');
 
 // Nav
 const canGoBack = ref(false);
 
 if (nav) {
-  nextTick(async () => {
-    canGoBack.value = await nav.value.$el.canGoBack();
-  });
+  setTimeout(async () => {
+    canGoBack.value = await nav?.value.canGoBack();
+  }, 100);
 }
 
 async function back() {
@@ -34,7 +34,7 @@ async function back() {
     return;
   }
 
-  nav.value.$el.pop();
+  nav?.value.pop();
 }
 
 function dismissModal() {
@@ -48,7 +48,7 @@ function dismissModal() {
       <ion-toolbar>
         <div slot="start">
           <ion-buttons v-if="canGoBack">
-            <ion-button @click="back">返回</ion-button>
+            <ion-button @click="back">Back</ion-button>
           </ion-buttons>
         </div>
 

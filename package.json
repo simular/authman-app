@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@asika32764/vite-plugin-show-env": "^1.0.3",
+    "@capacitor-community/barcode-scanner": "^4.0.1",
     "@capacitor-community/electron": "^5.0.1",
     "@capacitor/cli": "5.7.3",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",

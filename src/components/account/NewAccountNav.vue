@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AccountCreation from '@/components/account/new/AccountCreation.vue';
 import { IonNav } from '@ionic/vue';
-import { provide, ref } from 'vue';
+import { ComponentPublicInstance, computed, provide, ref } from 'vue';
 
-const nav = ref<HTMLIonNavElement>();
+const nav = ref<ComponentPublicInstance<typeof IonNav>>();
+const navComponent = computed<HTMLIonNavElement>(() => nav.value?.$el);
 
-provide('nav', nav);
+provide('nav', navComponent);
+
 </script>
 
 <template>
