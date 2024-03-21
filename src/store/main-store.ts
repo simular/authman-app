@@ -1,3 +1,4 @@
+import accountService from '@/service/account-service';
 import { Account, User } from '@/types';
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
 import { computed, reactive } from 'vue';
@@ -23,4 +24,4 @@ export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
 export const encMasterStorage = useLocalStorage('@authman:enc.master', '');
 export const kekStorage = useLocalStorage('@authman:kek', '');
 
-export const accountsStorage = useLocalStorage<Account[]>('@authman:accounts', []);
+export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:accounts', []);

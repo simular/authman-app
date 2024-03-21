@@ -1,13 +1,19 @@
 <script setup lang="ts">
 
 import ModalLayout from '@/components/layout/ModalLayout.vue';
+import accountService from '@/service/account-service';
 import apiClient from '@/service/api-client';
+import { userStorage } from '@/store/main-store';
+import { Account } from '@/types';
 import { simpleAlert, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonButton, IonButtons, IonSearchbar, IonSpinner } from '@ionic/vue';
+import { useDateFormat } from '@vueuse/core';
+import dayjs from 'dayjs';
+import { uuidv7 } from 'uuidv7';
 import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -26,6 +32,7 @@ enum ImageSource {
 const q = ref('');
 const imageSource = ref(ImageSource.DEFAULT);
 const { loading, run } = useLoading();
+const { loading: saving, run: runSave } = useLoading();
 
 onMounted(async () => {
   logo.value = await findFontAwesome('key');
@@ -94,7 +101,40 @@ async function pasteImage() {
   const blob = await items[0].getType(type);
   const file = new File([blob], 'image.png', { type });
 
-  const promise = new Promise<string>((resolve) => {
+  logo.value = await resizeImage(await readFileAsBase64(file));
+
+  imageSource.value = ImageSource.PASTE;
+}
+
+// Upload
+async function pickImage() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+
+  const promise = new Promise<File | undefined>((resolve) => {
+    input.addEventListener('change', (e) => {
+      const file = input.files?.[0];
+
+      resolve(file);
+    });
+
+    input.click();
+  });
+
+  const file = await promise;
+
+  if (!file) {
+    return;
+  }
+
+  logo.value = await resizeImage(await readFileAsBase64(file));
+
+  imageSource.value = ImageSource.UPLOAD;
+}
+
+async function readFileAsBase64(file: File) {
+  return new Promise<string>((resolve) => {
     const reader = new FileReader();
 
     reader.addEventListener('load', (event) => {
@@ -103,15 +143,70 @@ async function pasteImage() {
 
     reader.readAsDataURL(file);
   });
-
-  logo.value = await promise;
-
-  imageSource.value = ImageSource.PASTE;
 }
 
-// Upload
-async function upload() {
-  
+async function resizeImage(imgDataUri: string) {
+  return new Promise<string>((resolve) => {
+    const img = document.createElement('img');
+    img.addEventListener('load', (evt) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 96;
+      canvas.height = 96;
+
+      const ctx = canvas.getContext("2d")!;
+
+      const maxWidth = canvas.width;
+      const maxHeight = canvas.height;
+
+      let width = img.width;
+      let height = img.height;
+      let x = 0;
+      let y = 0;
+
+      // Resize
+      if (width > height) {
+        if (width > maxWidth) {
+          height = height * (maxWidth / width);
+          width = maxWidth;
+          y = (maxHeight - height) / 2;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = width * (maxHeight / height);
+          height = maxHeight;
+          x = (maxWidth - width) / 2;
+        }
+      }
+
+      // Actual resizing
+      ctx.drawImage(img, x, y, width, height);
+
+      // Show resized image in preview element
+      const dataUri = canvas.toDataURL('image/png');
+
+      resolve(dataUri);
+    });
+    img.src = imgDataUri;
+  });
+}
+
+async function save() {
+  const user = userStorage.value!;
+  const account: Account = {
+    id: uuidv7(),
+    userId: user.id,
+    content: {
+      title: props.title,
+      secret: props.secret,
+      url: props.host,
+    },
+    image: '',
+    created: dayjs().toISOString(),
+    modified: null,
+    params: {}
+  };
+
+  accountService.create(account, logo.value);
 }
 </script>
 
@@ -167,9 +262,21 @@ async function upload() {
             <FontAwesomeIcon :icon="faClipboard" style="margin-right: .5rem" />
             Paste
           </ion-button>
-          <ion-button fill="outline" color="dark">
+          <ion-button fill="outline" color="dark"
+            @click="pickImage">
             <FontAwesomeIcon :icon="faUpload" style="margin-right: .5rem" />
             Upload
+          </ion-button>
+        </div>
+
+        <div style="margin-top: 2rem">
+          <ion-button expand="block">
+            <template v-if="saving">
+              <ion-spinner name="dots" />
+            </template>
+            <template v-else>
+              Save
+            </template>
           </ion-button>
         </div>
       </div>

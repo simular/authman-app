@@ -2,8 +2,9 @@ export interface Account<T = AccountContent> {
   id: string;
   userId: string;
   content: T;
+  image: string;
   created: string;
-  modified: string;
+  modified: string | null;
   params: any;
   [name: string]: any;
 }
@@ -11,6 +12,6 @@ export interface Account<T = AccountContent> {
 export interface AccountContent {
   title: string;
   secret: string;
-  icon: string;
+  icon?: string;
   url: string;
 }

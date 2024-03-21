@@ -38,6 +38,10 @@ defineProps<{
     </ion-header>
 
     <ion-content>
+      <template v-if="$slots.fixed">
+        <slot name="fixed"></slot>
+      </template>
+
       <slot></slot>
     </ion-content>
   </ion-page>

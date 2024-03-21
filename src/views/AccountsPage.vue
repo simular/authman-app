@@ -14,6 +14,10 @@
       </ion-buttons>
     </template>
 
+    <ion-refresher slot="fixed" @ionRefresh="handleRefresh">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
     <ion-searchbar :animated="true" placeholder="Search" v-model="q"
       autocapitalize="none"></ion-searchbar>
 
@@ -29,7 +33,7 @@
             style="margin: 0; height: 100%">
             <ion-card-content>
               <div class="ion-text-center ion-padding">
-                <img :src="item.content.icon" alt="img" style="width: 56px; aspect-ratio: 1">
+                <img :src="item.image" alt="img" style="width: 56px; aspect-ratio: 1">
               </div>
               <div class="line-clamp">
                 <h4>{{ item.content.title }}</h4>
@@ -70,8 +74,10 @@
 import NewAccountNav from '@/components/account/NewAccountNav.vue';
 import AccountToken from '@/components/AccountToken.vue';
 import MainLayout from '@/components/layout/MainLayout.vue';
+import accountService from '@/service/account-service';
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
+import encryptionService from '@/service/encryption-service';
 import {
   accountsStorage,
   encMasterStorage,
@@ -92,14 +98,15 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonModal,
+  IonModal, IonRefresher, IonRefresherContent,
   IonRow,
-  IonSearchbar,
+  IonSearchbar, RefresherCustomEvent,
 } from '@ionic/vue';
 import { computed, onMounted, ref } from 'vue';
 
+const decryptedAccounts = ref<Account[]>([]);
 const items = computed(() => {
-  let accounts = accountsStorage.value;
+  let accounts = decryptedAccounts.value;
 
   if (q.value === '') {
     return accounts;
@@ -123,39 +130,31 @@ const items = computed(() => {
 const active = ref<Account>();
 
 onMounted(async () => {
-  await loadAccounts();
+  decryptedAccounts.value = await accountService.getDecryptedAccounts();
 });
 
-async function loadAccounts() {
-  const res = await apiClient.get<{
-    data: {
-      items: Account<string>[];
-    }
-  }>('account/list');
-
-  accountsStorage.value = await prepareAccounts(res.data.data.items);
+async function handleRefresh(e: RefresherCustomEvent) {
+  try {
+    await accountService.loadAccounts();
+  } finally {
+    e.target.complete();
+  }
 }
 
 // Prepare
-async function prepareAccounts(items: Account<string>[]): Promise<Account[]> {
-  const kek = kekStorage.value;
-  const secret = await sodiumCipher.decrypt(base64UrlDecode(encSecretStorage.value), secretToolkit.decode(kek));
-  const master = await sodiumCipher.decrypt(base64UrlDecode(encMasterStorage.value), secret);
-
-  let accounts = [];
-
-  for (const item of items) {
-    const content = await sodiumCipher.decrypt(base64UrlDecode(item.content), master);
-
-    const json = JSON.parse(uint82text(content)) as AccountContent;
-    const account = item as any;
-    account.content = json;
-
-    accounts.push(account);
-  }
-
-  return accounts;
-}
+// async function decryptAccounts(items: Account<string>[]): Promise<Account[]> {
+//   const master = await encryptionService.getMasterKey();
+//
+//   let accounts = [];
+//
+//   for (const item of items) {
+//     const account = await accountService.decryptAccount(item, master);
+//
+//     accounts.push(account);
+//   }
+//
+//   return accounts;
+// }
 
 // Select account
 const accountModalOpen = computed(() => active.value != undefined);
