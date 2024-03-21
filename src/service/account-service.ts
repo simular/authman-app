@@ -11,16 +11,17 @@ export default new class {
     const master = await encryptionService.getMasterKey();
 
     account = cloneDeep(account);
-    let encImage = '';
 
-    if (image) {
-      encImage = base64UrlEncode(
-        await sodiumCipher.encrypt(
-          image,
-          master,
-        )
-      );
+    if (!image) {
+      throw new Error('No image');
     }
+
+    const encImage = base64UrlEncode(
+      await sodiumCipher.encrypt(
+        image,
+        master,
+      )
+    );
 
     const encryptedAccount = await this.encryptAccount(account, master);
 

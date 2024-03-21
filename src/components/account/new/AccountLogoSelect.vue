@@ -70,7 +70,7 @@ async function findFontAwesome(q: string) {
 const colors = [
   '#f44336',
   '#e91e63',
-  '#9C27B0',
+  '#7E57C2',
   '#2196f3',
   '#009688',
   '#ffc107',
@@ -96,6 +96,10 @@ async function pasteImage() {
   }
 
   types = types.slice().sort();
+
+  if (!checkFileType(types)) {
+    return;
+  }
 
   const type = types[0];
   const blob = await items[0].getType(type);
@@ -128,9 +132,23 @@ async function pickImage() {
     return;
   }
 
+  if (!checkFileType([file.type])) {
+    return;
+  }
+
   logo.value = await resizeImage(await readFileAsBase64(file));
 
   imageSource.value = ImageSource.UPLOAD;
+}
+
+function checkFileType(types: readonly string[]) {
+  for (const type of types) {
+    if (type.startsWith('image/')) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 async function readFileAsBase64(file: File) {
@@ -192,6 +210,7 @@ async function resizeImage(imgDataUri: string) {
 
 async function save() {
   const user = userStorage.value!;
+  console.log(user);
   const account: Account = {
     id: uuidv7(),
     userId: user.id,
@@ -206,7 +225,7 @@ async function save() {
     params: {}
   };
 
-  accountService.create(account, logo.value);
+  await accountService.create(account, logo.value);
 }
 </script>
 
@@ -227,7 +246,7 @@ async function save() {
 
         <div class="ion-text-center l-logo-select__search">
           <div style="margin-bottom: .5rem; width: 100%; display: flex; justify-content: center">
-            <ion-searchbar autocapitalize="none" v-model="q" placeholder="Search FontAwesome"
+            <ion-searchbar autocapitalize="none" v-model="q" placeholder="Search Icon (FontAwesome)"
               color="medium"
               style="width: 85%" />
           </div>
@@ -247,7 +266,7 @@ async function save() {
               :style="{ '--background': color }"
               :active="currentColor === color"
               @click="currentColor = color"
-              :disabled="imageSource !== ImageSource.FONT_AWESOME"
+              :disabled="!(imageSource === ImageSource.FONT_AWESOME || imageSource === ImageSource.DEFAULT)"
             >
             </ion-button>
           </ion-buttons>
@@ -270,12 +289,12 @@ async function save() {
         </div>
 
         <div style="margin-top: 2rem">
-          <ion-button expand="block">
+          <ion-button expand="block" @click="save">
             <template v-if="saving">
               <ion-spinner name="dots" />
             </template>
             <template v-else>
-              Save
+              Create
             </template>
           </ion-button>
         </div>

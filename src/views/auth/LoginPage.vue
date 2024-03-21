@@ -32,12 +32,14 @@ async function authenticate() {
   });
 
   const { user, accessToken, refreshToken, encSecret, encMaster } = result;
-
+  
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
   refreshTokenStorage.value = refreshToken;
   encSecretStorage.value = encSecret;
   encMasterStorage.value = encMaster;
+
+  console.log(userStorage.value, user);
 
   router.replace({
     name: 'accounts',

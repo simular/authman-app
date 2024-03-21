@@ -11,9 +11,9 @@ export const mainStore = reactive<{
 
 export const accessTokenStorage = useLocalStorage('@authman:access.token', '');
 export const refreshTokenStorage = useLocalStorage('@authman:refresh.token', '');
-export const userStorage = useLocalStorage<User | undefined>(
+export const userStorage = useLocalStorage<User | null>(
   '@authman:user',
-  undefined,
+  null,
   {
     serializer: StorageSerializers.object
   }

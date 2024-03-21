@@ -1,4 +1,5 @@
 import { isLogin } from '@/store/main-store';
+import sodium from 'libsodium-wrappers';
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
@@ -28,7 +29,9 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router);
   
-router.isReady().then(() => {
+router.isReady().then(async () => {
+  await sodium.ready;
+
   app.mount('#app');
 
   if (!isLogin.value) {

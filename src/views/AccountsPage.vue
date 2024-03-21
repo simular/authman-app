@@ -75,18 +75,8 @@ import NewAccountNav from '@/components/account/NewAccountNav.vue';
 import AccountToken from '@/components/AccountToken.vue';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import accountService from '@/service/account-service';
-import apiClient from '@/service/api-client';
-import { sodiumCipher } from '@/service/cipher';
-import encryptionService from '@/service/encryption-service';
-import {
-  accountsStorage,
-  encMasterStorage,
-  encSecretStorage,
-  kekStorage,
-} from '@/store/main-store';
-import { Account, AccountContent } from '@/types';
-import { base64UrlDecode, uint82text } from '@/utilities/convert';
-import secretToolkit from '@/utilities/secret-toolkit';
+import { userStorage } from '@/store/main-store';
+import { Account } from '@/types';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -98,9 +88,12 @@ import {
   IonCol,
   IonContent,
   IonGrid,
-  IonModal, IonRefresher, IonRefresherContent,
+  IonModal,
+  IonRefresher,
+  IonRefresherContent,
   IonRow,
-  IonSearchbar, RefresherCustomEvent,
+  IonSearchbar,
+  RefresherCustomEvent,
 } from '@ionic/vue';
 import { computed, onMounted, ref } from 'vue';
 
