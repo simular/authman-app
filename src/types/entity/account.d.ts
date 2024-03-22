@@ -12,6 +12,6 @@ export interface Account<T = AccountContent> {
 export interface AccountContent {
   title: string;
   secret: string;
-  icon?: string;
+  image: string;
   url: string;
 }

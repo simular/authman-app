@@ -14,11 +14,17 @@ import {
 } from '@ionic/vue';
 import { ComputedRef, inject, nextTick, ref } from 'vue';
 
-defineProps<{
-  title?: string;
-}>();
+withDefaults(
+  defineProps<{
+    title?: string;
+    scrollY?: boolean;
+  }>(),
+  {
+    scrollY: true
+  }
+);
 
-const nav = inject<ComputedRef<HTMLIonNavElement>>('nav');
+const nav = inject<ComputedRef<HTMLIonNavElement> | undefined>('nav', undefined);
 
 // Nav
 const canGoBack = ref(false);
@@ -44,34 +50,34 @@ function dismissModal() {
 
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <div slot="start">
-          <ion-buttons v-if="canGoBack">
-            <ion-button @click="back">Back</ion-button>
+    <slot name="header">
+      <ion-header>
+        <ion-toolbar>
+          <div slot="start">
+            <ion-buttons v-if="canGoBack">
+              <ion-button @click="back">Back</ion-button>
+            </ion-buttons>
+          </div>
+
+          <slot name="title">
+            <ion-title v-if="title" class="">{{ title }}</ion-title>
+          </slot>
+
+          <ion-buttons slot="end">
+            <ion-button @click="dismissModal" size="large" color="dark">
+              <FontAwesomeIcon :icon="faTimes" />
+            </ion-button>
           </ion-buttons>
-        </div>
+        </ion-toolbar>
+      </ion-header>
+    </slot>
 
-        <slot name="title">
-          <ion-title v-if="title" class="">{{ title }}</ion-title>
-        </slot>
-
-        <ion-buttons slot="end">
-          <ion-button @click="dismissModal" size="large" color="dark">
-            <FontAwesomeIcon :icon="faTimes" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
+    <ion-content :scroll-y="scrollY">
       <slot></slot>
     </ion-content>
 
     <ion-footer v-if="$slots.footer">
-      <ion-toolbar>
-        <slot name="footer"></slot>
-      </ion-toolbar>
+      <slot name="footer"></slot>
     </ion-footer>
   </ion-page>
 </template>

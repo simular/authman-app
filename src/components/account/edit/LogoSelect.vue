@@ -1,26 +1,12 @@
 <script setup lang="ts">
-
-import ModalLayout from '@/components/layout/ModalLayout.vue';
-import accountService from '@/service/account-service';
 import apiClient from '@/service/api-client';
-import { userStorage } from '@/store/main-store';
-import { Account } from '@/types';
 import { simpleAlert, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonButton, IonButtons, IonSearchbar, IonSpinner } from '@ionic/vue';
-import { useDateFormat } from '@vueuse/core';
-import dayjs from 'dayjs';
-import { uuidv7 } from 'uuidv7';
 import { onMounted, ref, watch } from 'vue';
-
-const props = defineProps<{
-  secret: string;
-  title: string;
-  host: string;
-}>();
 
 enum ImageSource {
   FONT_AWESOME,
@@ -29,16 +15,15 @@ enum ImageSource {
   DEFAULT,
 }
 
+const logo = defineModel({ default: '' });
 const q = ref('');
 const imageSource = ref(ImageSource.DEFAULT);
 const { loading, run } = useLoading();
-const { loading: saving, run: runSave } = useLoading();
 
 onMounted(async () => {
   logo.value = await findFontAwesome('key');
 });
 
-const logo = ref('');
 const emptyImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 async function searchIcon() {
@@ -58,9 +43,9 @@ async function findFontAwesome(q: string) {
     {
       params: {
         q,
-        color: currentColor.value
-      }
-    }
+        color: currentColor.value,
+      },
+    },
   ));
 
   return res.data.data?.image || null;
@@ -70,11 +55,11 @@ async function findFontAwesome(q: string) {
 const colors = [
   '#f44336',
   '#e91e63',
-  '#7E57C2',
+  '#7e57c2',
   '#2196f3',
   '#009688',
   '#ffc107',
-  '#FF9800',
+  '#ff9800',
   '#ffffff',
 ];
 
@@ -207,100 +192,68 @@ async function resizeImage(imgDataUri: string) {
     img.src = imgDataUri;
   });
 }
-
-async function save() {
-  const user = userStorage.value!;
-  console.log(user);
-  const account: Account = {
-    id: uuidv7(),
-    userId: user.id,
-    content: {
-      title: props.title,
-      secret: props.secret,
-      url: props.host,
-    },
-    image: '',
-    created: dayjs().toISOString(),
-    modified: null,
-    params: {}
-  };
-
-  await accountService.create(account, logo.value);
-}
 </script>
 
 <template>
-  <ModalLayout title="Select Logo">
-    <div class="box-center ion-padding" :class="{ 'h-loading': loading }" style="height: 100%">
-      <div class="l-logo-select" style="width: 100%">
-        <div class="ion-text-center l-logo-select__preview" style="margin-bottom: 1rem">
-          <div class="ion-padding c-logo-preview">
-            <img class="c-logo-preview__img" :src="logo || emptyImage" alt="logo" style="">
+  <div class="" :class="{ 'h-loading': loading }" style="height: 100%">
+    <div class="l-logo-select" style="width: 100%">
+      <div class="ion-text-center l-logo-select__preview" style="margin-bottom: 1rem">
+        <div class="ion-padding c-logo-preview">
+          <img class="c-logo-preview__img" :src="logo || emptyImage" alt="logo" style="">
 
-            <ion-spinner v-if="loading"
-              class="c-logo-preview__spinner"
-              name="crescent"
-            ></ion-spinner>
-          </div>
-        </div>
-
-        <div class="ion-text-center l-logo-select__search">
-          <div style="margin-bottom: .5rem; width: 100%; display: flex; justify-content: center">
-            <ion-searchbar autocapitalize="none" v-model="q" placeholder="Search Icon (FontAwesome)"
-              color="medium"
-              style="width: 85%" />
-          </div>
-
-          <ion-button @click="searchIcon" fill="outline" color="dark"
-            style="width: 150px"
-            :disabled="q === ''">
-            Search
-          </ion-button>
-        </div>
-
-        <div class="l-logo-select__colors" style="display: flex; justify-content: center; margin-top: .75rem">
-          <ion-buttons>
-            <ion-button v-for="color of colors"
-              :key="color"
-              style="width: 30px"
-              :style="{ '--background': color }"
-              :active="currentColor === color"
-              @click="currentColor = color"
-              :disabled="!(imageSource === ImageSource.FONT_AWESOME || imageSource === ImageSource.DEFAULT)"
-            >
-            </ion-button>
-          </ion-buttons>
-        </div>
-
-        <hr />
-
-        <div class="l-logo-select__toolbar"
-          style="margin-top: 1.5rem; display: flex; justify-content: center; gap: .75rem">
-          <ion-button fill="outline" color="dark"
-            @click="pasteImage">
-            <FontAwesomeIcon :icon="faClipboard" style="margin-right: .5rem" />
-            Paste
-          </ion-button>
-          <ion-button fill="outline" color="dark"
-            @click="pickImage">
-            <FontAwesomeIcon :icon="faUpload" style="margin-right: .5rem" />
-            Upload
-          </ion-button>
-        </div>
-
-        <div style="margin-top: 2rem">
-          <ion-button expand="block" @click="save">
-            <template v-if="saving">
-              <ion-spinner name="dots" />
-            </template>
-            <template v-else>
-              Create
-            </template>
-          </ion-button>
+          <ion-spinner v-if="loading"
+            class="c-logo-preview__spinner"
+            name="crescent"
+          ></ion-spinner>
         </div>
       </div>
+
+      <div class="ion-text-center l-logo-select__search">
+        <div style="margin-bottom: .5rem; width: 100%; display: flex; justify-content: center">
+          <ion-searchbar autocapitalize="none" v-model="q" placeholder="Search Icon (FontAwesome)"
+            color="medium"
+            style="" />
+        </div>
+
+        <ion-button @click="searchIcon" fill="outline" color="dark"
+          style="width: 150px"
+          :disabled="q === ''">
+          Search
+        </ion-button>
+      </div>
+
+      <div class="l-logo-select__colors"
+        style="display: flex; justify-content: center; margin-top: .75rem">
+        <ion-buttons>
+          <ion-button v-for="color of colors"
+            :key="color"
+            style="width: 30px"
+            :style="{ '--background': color }"
+            :active="currentColor === color"
+            @click="currentColor = color"
+            :disabled="!(imageSource === ImageSource.FONT_AWESOME || imageSource === ImageSource.DEFAULT)"
+          >
+          </ion-button>
+        </ion-buttons>
+      </div>
+
+      <hr />
+
+      <div class="l-logo-select__toolbar"
+        style="margin-top: 1.5rem; display: flex; justify-content: center; gap: .75rem">
+        <ion-button fill="outline" color="dark"
+          @click="pasteImage">
+          <FontAwesomeIcon :icon="faClipboard" style="margin-right: .5rem" />
+          Paste
+        </ion-button>
+        <ion-button fill="outline" color="dark"
+          @click="pickImage">
+          <FontAwesomeIcon :icon="faUpload" style="margin-right: .5rem" />
+          Upload
+        </ion-button>
+      </div>
     </div>
-  </ModalLayout>
+  </div>
 </template>
 
 <style scoped lang="scss">

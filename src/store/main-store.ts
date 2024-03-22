@@ -5,8 +5,10 @@ import { computed, reactive } from 'vue';
 
 export const mainStore = reactive<{
   user?: User;
+  decryptedAccounts: Account[];
 }>({
   user: undefined,
+  decryptedAccounts: []
 });
 
 export const accessTokenStorage = useLocalStorage('@authman:access.token', '');
@@ -24,4 +26,7 @@ export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
 export const encMasterStorage = useLocalStorage('@authman:enc.master', '');
 export const kekStorage = useLocalStorage('@authman:kek', '');
 
+export const accountsLoaded = useLocalStorage('@authman:accounts.loaded', false, {
+  serializer: StorageSerializers.boolean
+});
 export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:accounts', []);

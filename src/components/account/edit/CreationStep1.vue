@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ModalLayout from '@/components/layout/ModalLayout.vue';
 import { simpleAlert } from '@/utilities/alert';
-import { BarcodeScanner, SupportedFormat } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonButton, IonInput, IonItem, IonList, IonNav } from '@ionic/vue';
+import { IonButton, IonInput, IonItem, IonList } from '@ionic/vue';
 import { trimStart } from 'lodash-es';
-import { ComponentPublicInstance, computed, ComputedRef, inject, onMounted, Ref, ref } from 'vue';
+import { ComputedRef, inject, onMounted, ref } from 'vue';
 
 const nav = inject<ComputedRef<HTMLIonNavElement>>('nav');
 
@@ -90,21 +90,29 @@ function decodeTheUri(uri: string) {
   title.value = decodeURIComponent(String(path[1])) || '';
 }
 
+const saving = ref(false);
+
 async function next() {
   if (!secret.value) {
     return;
   }
-  
-  const AccountLogoSelect = (await import('@/components/account/new/AccountLogoSelect.vue')).default;
+
+  const AccountLogoSelect = (await import('@/components/account/edit/CreationStep2.vue')).default;
+
+  saving.value = true;
 
   nav?.value.push(
     AccountLogoSelect,
     {
       secret: secret.value,
       title: title.value,
-      host: host.value
-    }
+      host: host.value,
+    },
   );
+
+  setTimeout(() => {
+    saving.value = false;
+  }, 1500);
 }
 </script>
 
@@ -148,7 +156,7 @@ async function next() {
 
       <ion-button expand="block" style="width: 75%"
         @click="next"
-        :disabled="secret === '' || title === ''"
+        :disabled="secret === '' || title === '' || saving"
       >
         Next
       </ion-button>

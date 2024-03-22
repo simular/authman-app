@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AccountCreation from '@/components/account/new/AccountCreation.vue';
+import AccountCreation from '@/components/account/edit/CreationStep1.vue';
 import { IonNav } from '@ionic/vue';
 import { type ComponentPublicInstance, computed, provide, ref } from 'vue';
 

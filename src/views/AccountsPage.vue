@@ -2,15 +2,27 @@
   <MainLayout>
     <template #end>
       <ion-buttons>
-        <ion-button>
-          <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
-          <span>Select</span>
-        </ion-button>
+        <template v-if="selectMode">
+          <ion-button @click="selectMode = false">
+            <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
+            <span>Cancel</span>
+          </ion-button>
+          <ion-button color="danger" @click="deleteAccounts(selectedAccounts)">
+            <FontAwesomeIcon :icon="faTrash" style="margin-right: .25rem" />
+            <span>Delete {{ selectedAccounts.length > 0 ? `(${selectedAccounts.length})` : '' }}</span>
+          </ion-button>
+        </template>
+        <template v-else>
+          <ion-button @click="selectMode = true">
+            <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
+            <span>Select</span>
+          </ion-button>
 
-        <ion-button @click="createAccount">
-          <FontAwesomeIcon :icon="faPlus" style="margin-right: .25rem" />
-          <span>New</span>
-        </ion-button>
+          <ion-button @click="createAccount">
+            <FontAwesomeIcon :icon="faPlus" style="margin-right: .25rem" />
+            <span>New</span>
+          </ion-button>
+        </template>
       </ion-buttons>
     </template>
 
@@ -29,11 +41,12 @@
 
           <!-- Account Card -->
           <ion-card @click="selectAccount(item)"
+            :color="isSelected(item.id) ? 'primary' : ''"
             button
             style="margin: 0; height: 100%">
             <ion-card-content>
               <div class="ion-text-center ion-padding">
-                <img :src="item.image" alt="img" style="width: 56px; aspect-ratio: 1">
+                <img :src="item.content.image" alt="img" style="width: 56px; aspect-ratio: 1">
               </div>
               <div class="line-clamp">
                 <h4>{{ item.content.title }}</h4>
@@ -51,12 +64,10 @@
       :is-open="accountModalOpen"
       @didDismiss="active = undefined"
     >
-      <ion-content class="ion-padding" v-if="active"
-        :scroll-y="false">
-        <div class="box-center" style="height: 100%">
-          <AccountToken :item="active" />
-        </div>
-      </ion-content>
+      <AccountModalBody v-if="active" :account="active"
+        @edit=""
+        @delete="deleteAccounts([active])"
+      />
     </ion-modal>
 
     <!-- Account New Modal -->
@@ -71,14 +82,16 @@
 </template>
 
 <script setup lang="ts">
-import NewAccountNav from '@/components/account/NewAccountNav.vue';
-import AccountToken from '@/components/AccountToken.vue';
+import NewAccountNav from '@/components/account/AccountEditNav.vue';
+import AccountModalBody from '@/components/account/AccountModalBody.vue';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import accountService from '@/service/account-service';
-import { userStorage } from '@/store/main-store';
+import apiClient from '@/service/api-client';
+import { mainStore } from '@/store/main-store';
 import { Account } from '@/types';
+import { simpleConfirm } from '@/utilities/alert';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   IonButton,
@@ -86,28 +99,31 @@ import {
   IonCard,
   IonCardContent,
   IonCol,
-  IonContent,
   IonGrid,
   IonModal,
   IonRefresher,
   IonRefresherContent,
   IonRow,
   IonSearchbar,
+  modalController,
   RefresherCustomEvent,
 } from '@ionic/vue';
-import { computed, onMounted, ref } from 'vue';
+import { refDebounced } from '@vueuse/core';
+import { computed, onMounted, ref, watch } from 'vue';
 
-const decryptedAccounts = ref<Account[]>([]);
+// Search
+const q = ref('');
+const qDebounced = refDebounced(q, 500);
 const items = computed(() => {
-  let accounts = decryptedAccounts.value;
+  let accounts = mainStore.decryptedAccounts;
 
-  if (q.value === '') {
+  if (qDebounced.value === '') {
     return accounts;
   }
 
   return accounts.filter((account) => {
     const content = account.content;
-    const qi = q.value.toLowerCase();
+    const qi = qDebounced.value.toLowerCase();
 
     if (content.title.toLowerCase().includes(qi)) {
       return true;
@@ -123,7 +139,9 @@ const items = computed(() => {
 const active = ref<Account>();
 
 onMounted(async () => {
-  decryptedAccounts.value = await accountService.getDecryptedAccounts();
+  selectMode.value = false;
+
+  await accountService.loadAccounts();
 });
 
 async function handleRefresh(e: RefresherCustomEvent) {
@@ -134,26 +152,31 @@ async function handleRefresh(e: RefresherCustomEvent) {
   }
 }
 
-// Prepare
-// async function decryptAccounts(items: Account<string>[]): Promise<Account[]> {
-//   const master = await encryptionService.getMasterKey();
-//
-//   let accounts = [];
-//
-//   for (const item of items) {
-//     const account = await accountService.decryptAccount(item, master);
-//
-//     accounts.push(account);
-//   }
-//
-//   return accounts;
-// }
-
-// Select account
+// Open account
 const accountModalOpen = computed(() => active.value != undefined);
 
 function selectAccount(account: Account) {
+  if (selectMode.value) {
+    if (isSelected(account.id)) {
+      selected.value = selected.value.filter((id) => id !== account.id);
+    } else {
+      selected.value.push(account.id);
+    }
+
+    return;
+  }
+
   active.value = account;
+}
+
+const selectedAccounts = computed(() => {
+  return items.value.filter((item) => {
+    return isSelected(item.id);
+  });
+});
+
+function isSelected(id: string) {
+  return selected.value.includes(id);
 }
 
 // Account New
@@ -163,8 +186,43 @@ function createAccount() {
   newModalOpen.value = true;
 }
 
-// Search
-const q = ref('');
+// Select
+const selectMode = ref(false);
+const selected = ref<string[]>([]);
+
+watch(selectMode, (v) => {
+  if (!v) {
+    selected.value = [];
+  }
+});
+
+// CRUD
+async function editAccount(account: Account) {
+
+}
+
+async function deleteAccounts(accounts: Account[]) {
+  const v = await simpleConfirm(
+    `Do you really want to delete?`,
+    ' This action cannot redo.',
+  );
+
+  if (!v) {
+    return;
+  }
+
+  const ids = accounts.map((item) => item.id);
+
+  const res = await apiClient.delete('account/delete', { data: { ids } });
+
+  mainStore.decryptedAccounts = mainStore.decryptedAccounts.filter((account) => {
+    return !ids.includes(account.id);
+  });
+
+  modalController.dismiss();
+
+  selectMode.value = false;
+}
 
 </script>
 

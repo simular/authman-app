@@ -1,7 +1,7 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import { accountsStorage } from '@/store/main-store';
+import { accountsStorage, mainStore } from '@/store/main-store';
 import { Account, AccountContent } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
 import { cloneDeep } from 'lodash-es';
@@ -16,20 +16,12 @@ export default new class {
       throw new Error('No image');
     }
 
-    const encImage = base64UrlEncode(
-      await sodiumCipher.encrypt(
-        image,
-        master,
-      )
-    );
-
     const encryptedAccount = await this.encryptAccount(account, master);
 
     const res = await apiClient.post(
       'account/save',
       {
         item: encryptedAccount,
-        image: encImage,
       },
     );
   }
@@ -41,25 +33,8 @@ export default new class {
       }
     }>('account/list');
     
-    accountsStorage.value = await this.prepareAccounts(res.data.data.items);
-  }
-
-  async prepareAccounts(items: Account<string>[]) {
-    const promises = [];
-
-    for (const item of items) {
-
-      promises.push(
-        this.fetchImage(item.image)
-          .then((img) => {
-            item.image = img;
-          })
-      );
-    }
-
-    await Promise.all(promises);
-
-    return items;
+    accountsStorage.value = await res.data.data.items;
+    mainStore.decryptedAccounts = await this.getDecryptedAccounts();
   }
 
   async encryptAccount(account: Account, key: Uint8Array | string) {
@@ -81,12 +56,6 @@ export default new class {
     const content = await sodiumCipher.decrypt(base64UrlDecode(account.content), key);
 
     item.content = JSON.parse(uint82text(content)) as AccountContent;
-
-    if (!item.image.startsWith('data:image')) {
-      item.image = uint82text(
-        await sodiumCipher.decrypt(base64UrlDecode(item.image), key)
-      );
-    }
 
     return item;
   }
