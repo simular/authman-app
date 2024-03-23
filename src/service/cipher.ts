@@ -1,5 +1,5 @@
 import { concatUnit8 } from '@/utilities/arr';
-import { uint82text, wrapUint8 } from '@/utilities/convert';
+import { base64UrlEncode, uint82text, wrapUint8 } from '@/utilities/convert';
 import { hashHkdf, hashPbkdf2 } from '@/utilities/crypto';
 import { timingSafeEquals } from '@windwalker-io/srp';
 import { uint8ToHex } from 'bigint-toolkit';

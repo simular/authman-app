@@ -21,7 +21,7 @@ const imageSource = ref(ImageSource.DEFAULT);
 const { loading, run } = useLoading();
 
 onMounted(async () => {
-  logo.value = await findFontAwesome('key');
+  logo.value = logo.value || await findFontAwesome('key');
 });
 
 const emptyImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';

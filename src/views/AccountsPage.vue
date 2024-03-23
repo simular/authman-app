@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <MainLayout show-menu-button>
     <template #end>
       <ion-buttons>
         <template v-if="selectMode">
@@ -65,7 +65,7 @@
       @didDismiss="active = undefined"
     >
       <AccountModalBody v-if="active" :account="active"
-        @edit=""
+        @edit="editAccount(active)"
         @delete="deleteAccounts([active])"
       />
     </ion-modal>
@@ -73,15 +73,20 @@
     <!-- Account New Modal -->
     <ion-modal
       class="new-modal"
-      :is-open="newModalOpen"
-      @didDismiss="newModalOpen = false"
+      :is-open="editModalOpen"
+      @didDismiss="editModalDismissed"
     >
-      <NewAccountNav />
+      <Suspense>
+        <AccountEditNav v-if="editModalOpen" :is-edit="isEdit"
+          :account="editingAccount"
+        />
+      </Suspense>
     </ion-modal>
   </MainLayout>
 </template>
 
 <script setup lang="ts">
+import AccountEditNav from '@/components/account/AccountEditNav.vue';
 import NewAccountNav from '@/components/account/AccountEditNav.vue';
 import AccountModalBody from '@/components/account/AccountModalBody.vue';
 import MainLayout from '@/components/layout/MainLayout.vue';
@@ -179,13 +184,6 @@ function isSelected(id: string) {
   return selected.value.includes(id);
 }
 
-// Account New
-const newModalOpen = ref(false);
-
-function createAccount() {
-  newModalOpen.value = true;
-}
-
 // Select
 const selectMode = ref(false);
 const selected = ref<string[]>([]);
@@ -197,8 +195,31 @@ watch(selectMode, (v) => {
 });
 
 // CRUD
-async function editAccount(account: Account) {
+// Account New
+const editModalOpen = ref(false);
+const isEdit = ref(false);
+const editingAccount = ref<Account>();
 
+function createAccount() {
+  isEdit.value = false;
+  editModalOpen.value = true;
+}
+
+function editModalDismissed() {
+  editModalOpen.value = false;
+
+  setTimeout(() => {
+    isEdit.value = false;
+    editingAccount.value = undefined;
+  }, 500);
+}
+
+async function editAccount(account: Account) {
+  await modalController.dismiss();
+
+  editingAccount.value = account;
+  isEdit.value = true;
+  editModalOpen.value = true;
 }
 
 async function deleteAccounts(accounts: Account[]) {

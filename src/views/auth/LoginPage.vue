@@ -20,26 +20,23 @@ const { loading, run } = useLoading();
 
 async function authenticate() {
   const result = await run(async () => {
-    const { salt, B, sess } = await authService.challenge(email.value);
-
-    return authService.authenticate(
-      email.value,
-      password.value,
-      sess,
-      hexToBigint(salt),
-      hexToBigint(B)
-    );
+    return authService.login(email.value, password.value);
+    // const { salt, B, sess } = await authService.challenge(email.value);
+    //
+    // return authService.authenticate(
+    //   email.value,
+    //   password.value,
+    //   sess,
+    //   hexToBigint(salt),
+    //   hexToBigint(B)
+    // );
   });
 
-  const { user, accessToken, refreshToken, encSecret, encMaster } = result;
-  
+  const { user, accessToken, refreshToken } = result;
+
   userStorage.value = user;
   accessTokenStorage.value = accessToken;
   refreshTokenStorage.value = refreshToken;
-  encSecretStorage.value = encSecret;
-  encMasterStorage.value = encMaster;
-
-  console.log(userStorage.value, user);
 
   router.replace({
     name: 'accounts',

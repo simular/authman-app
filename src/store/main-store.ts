@@ -1,4 +1,3 @@
-import accountService from '@/service/account-service';
 import { Account, User } from '@/types';
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
 import { computed, reactive } from 'vue';

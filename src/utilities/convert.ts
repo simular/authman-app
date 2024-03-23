@@ -1,3 +1,4 @@
+import { hexToUint8 } from 'bigint-toolkit';
 import { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers';
 
 export function text2uint8(str: string) {

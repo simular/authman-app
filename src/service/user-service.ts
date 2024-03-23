@@ -1,5 +1,11 @@
 import router from '@/router';
-import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
+import {
+  accessTokenStorage,
+  accountsLoaded,
+  accountsStorage, encMasterStorage, encSecretStorage, kekStorage, mainStore,
+  refreshTokenStorage,
+  userStorage,
+} from '@/store/main-store';
 
 export default new class UserService {
   logoutAndRedirect() {
@@ -7,6 +13,20 @@ export default new class UserService {
     accessTokenStorage.value = '';
     refreshTokenStorage.value = '';
 
+    accountsStorage.value = [];
+    accountsLoaded.value = false;
+
+    mainStore.user = undefined;
+    mainStore.decryptedAccounts = [];
+
+    this.clearSecrets();
+
     router.replace({ name: 'login' });
   }
-}
+
+  clearSecrets() {
+    encSecretStorage.value = '';
+    encMasterStorage.value = '';
+    kekStorage.value = '';
+  }
+};

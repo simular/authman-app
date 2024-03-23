@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HeaderCondense from '@/components/layout/HeaderCondense.vue';
 import {
   IonBackButton,
   IonButtons,
@@ -10,9 +11,18 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 
-defineProps<{
-  title?: string;
-}>();
+withDefaults(
+  defineProps<{
+    title?: string;
+    headerCondense?: boolean;
+    showMenuButton?: boolean;
+  }>(),
+  {
+    headerCondense: false,
+    showMenuButton: false,
+  },
+);
+
 </script>
 
 <template>
@@ -22,7 +32,8 @@ defineProps<{
         <div slot="start">
           <slot name="start">
             <ion-buttons>
-              <ion-menu-button></ion-menu-button>
+              <ion-menu-button v-if="showMenuButton"></ion-menu-button>
+              <ion-back-button v-else></ion-back-button>
             </ion-buttons>
           </slot>
         </div>
@@ -38,6 +49,10 @@ defineProps<{
     </ion-header>
 
     <ion-content>
+      <HeaderCondense v-if="title && headerCondense">
+        {{ title }}
+      </HeaderCondense>
+
       <template v-if="$slots.fixed">
         <slot name="fixed"></slot>
       </template>

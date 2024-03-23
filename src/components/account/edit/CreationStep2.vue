@@ -39,7 +39,7 @@ async function save() {
   };
 
   await runSave(async () => {
-    await accountService.create(account, logo.value);
+    await accountService.save(account);
 
     mainStore.decryptedAccounts.unshift(account);
 

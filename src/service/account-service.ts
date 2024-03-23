@@ -4,17 +4,14 @@ import encryptionService from '@/service/encryption-service';
 import { accountsStorage, mainStore } from '@/store/main-store';
 import { Account, AccountContent } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
+import { uint8ToHex } from 'bigint-toolkit';
 import { cloneDeep } from 'lodash-es';
 
 export default new class {
-  async create(account: Account, image: string) {
+  async save(account: Account) {
     const master = await encryptionService.getMasterKey();
 
     account = cloneDeep(account);
-
-    if (!image) {
-      throw new Error('No image');
-    }
 
     const encryptedAccount = await this.encryptAccount(account, master);
 
@@ -32,7 +29,7 @@ export default new class {
         items: Account<string>[];
       }
     }>('account/list');
-    
+
     accountsStorage.value = await res.data.data.items;
     mainStore.decryptedAccounts = await this.getDecryptedAccounts();
   }

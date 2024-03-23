@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import SideMenu from '@/components/SideMenu.vue';
-import Store from '@/components/Store.vue';
+import Store from '@/components/StoreViewer.vue';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 
 </script>

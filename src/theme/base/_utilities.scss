@@ -4,6 +4,16 @@
   justify-content: center;
 }
 
+.page-center {
+  @extend .box-center;
+
+  height: 100%;
+
+  > div {
+    width: 100%;
+  }
+}
+
 .line-clamp {
   display: -webkit-box;
   -webkit-line-clamp: var(--clamp-lines, 2);
