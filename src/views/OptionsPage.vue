@@ -3,7 +3,7 @@
     <ion-list style="margin-bottom: 2rem" inset>
       <ion-item>
         <FontAwesomeIcon :icon="faFingerprint" slot="start" />
-        <ion-toggle v-model="enableBiometrics">
+        <ion-toggle v-model="enableBiometricsOption">
           <ion-label>Enable Biometrics</ion-label>
           <ion-note color="medium">Touch ID or Face ID</ion-note>
         </ion-toggle>
@@ -50,21 +50,17 @@ import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { faFingerprint, faKey, faLock, faSignOut } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonItem, IonLabel, IonList, IonListHeader, IonNote, IonToggle } from '@ionic/vue';
-import { ref, watch } from 'vue';
+import { IonItem, IonLabel, IonList, IonNote, IonToggle } from '@ionic/vue';
+import { watch } from 'vue';
 
-const enableBiometrics = ref(enableBiometricsOption.value);
-
-watch(enableBiometrics, async (v) => {
+watch(enableBiometricsOption, async (v) => {
   if (v) {
-    try {
-      await lockScreenService.testBiometrics();
-    } catch (e) {
-      enableBiometrics.value = false;
+    const r = await lockScreenService.testBiometrics();
+
+    if (!r) {
+      enableBiometricsOption.value = false;
     }
   }
-
-  enableBiometricsOption.value = enableBiometrics.value;
 });
 
 function lockScreen() {

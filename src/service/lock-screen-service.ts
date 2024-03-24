@@ -63,11 +63,16 @@ export default new class {
   async testBiometrics() {
     try {
       const password = await this.askPassword();
+
+      if (!password) {
+        return false;
+      }
+
       const kek = await this.validatePasswordAndToKek(password);
 
       if (!kek) {
         simpleAlert('Invalid Password');
-        return;
+        return false;
       }
 
       await this.biometricsAuthenticate();
@@ -79,15 +84,19 @@ export default new class {
         false,
         KeychainAccess.whenPasscodeSetThisDeviceOnly,
       );
+
+      return true;
     } catch (e) {
       if (e instanceof Error) {
         simpleAlert(e.message);
       }
+
+      return false;
     }
   }
 
   async askPassword() {
-    return new Promise<string>((resolve) => {
+    return new Promise<string | false>((resolve) => {
       alertController.create({
         header: 'Please enter your password.',
         inputs: [
@@ -104,7 +113,16 @@ export default new class {
             },
           },
         ],
+        
       }).then((alert) => {
+        alert.onDidDismiss().then((e) => {
+          if (e.role === 'backdrop') {
+            resolve(false);
+          }
+
+          return e;
+        });
+        
         return alert.present();
       });
     });
