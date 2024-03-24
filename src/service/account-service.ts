@@ -1,10 +1,11 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import { accountsStorage, mainStore } from '@/store/main-store';
-import { Account, AccountContent } from '@/types';
+import userService from '@/service/user-service';
+import { accountsStorage, mainStore, userStorage } from '@/store/main-store';
+import { Account, AccountContent, User } from '@/types';
+import { simpleToast } from '@/utilities/alert';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
-import { uint8ToHex } from 'bigint-toolkit';
 import { cloneDeep } from 'lodash-es';
 
 export default new class {
@@ -26,11 +27,27 @@ export default new class {
   async loadAccounts() {
     const res = await apiClient.get<{
       data: {
+        user: User;
         items: Account<string>[];
       }
     }>('account/list');
 
-    accountsStorage.value = await res.data.data.items;
+    const { user, items } = res.data.data;
+
+    const currentUser = userStorage.value!;
+
+    if (currentUser.lastReset !== user.lastReset) {
+      simpleToast(
+        'The password has been changed, please re-login again.',
+        'top',
+        2500,
+      );
+
+      userService.logoutAndRedirect();
+      return;
+    }
+
+    accountsStorage.value = items;
     mainStore.decryptedAccounts = await this.getDecryptedAccounts();
   }
 

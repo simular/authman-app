@@ -1,4 +1,5 @@
 import { isLogin } from '@/store/main-store';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import sodium from 'libsodium-wrappers';
 import { createApp, nextTick } from 'vue';
 import App from './App.vue'
@@ -34,6 +35,7 @@ const app = createApp(App)
   
 router.isReady().then(async () => {
   await sodium.ready;
+  await SecureStorage.setSynchronize(false);
 
   app.mount('#app');
 

@@ -1,6 +1,6 @@
 import router from '@/router';
 import encryptionService from '@/service/encryption-service';
-import { isLock, noInstantUnlock, kekStorage, saltStorage } from '@/store/main-store';
+import { isLock, kekStorage, noInstantUnlock, saltStorage } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import {
@@ -8,8 +8,9 @@ import {
   BiometricAuth,
   BiometryType,
 } from '@aparajita/capacitor-biometric-auth';
+import { KeychainAccess, SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Capacitor } from '@capacitor/core';
-import { timingSafeEquals } from '@windwalker-io/srp';
+import { alertController } from '@ionic/vue';
 import idleTimeout from 'idle-timeout';
 import IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
@@ -20,6 +21,7 @@ export default new class {
 
   async lock() {
     isLock.value = true;
+    kekStorage.value = '';
     const idleInstance = this.getIdleInstance();
     idleInstance.pause();
 
@@ -35,25 +37,77 @@ export default new class {
     idleInstance.resume();
   }
 
-  async passwordAuthenticate(password: string) {
-    const kek = secretToolkit.encode(
-      await encryptionService.deriveKek(password, saltStorage.value),
-      Encoder.HEX,
-    );
+  async validatePasswordAndToKek(password: string) {
+    const kek = await encryptionService.deriveKek(password, saltStorage.value);
 
-    if (!timingSafeEquals(kekStorage.value, kek)) {
+    try {
+      await encryptionService.getSecretKey(kek);
+
+      return secretToolkit.encode(kek, Encoder.HEX);
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
+  async passwordAuthenticate(password: string) {
+    const kek = await this.validatePasswordAndToKek(password);
+
+    if (!kek) {
       throw new Error('Invalid password');
     }
+
+    return kek;
   }
 
   async testBiometrics() {
     try {
+      const password = await this.askPassword();
+      const kek = await this.validatePasswordAndToKek(password);
+
+      if (!kek) {
+        simpleAlert('Invalid Password');
+        return;
+      }
+
       await this.biometricsAuthenticate();
+
+      await SecureStorage.set(
+        '@authman:secure.kek',
+        kek,
+        undefined,
+        false,
+        KeychainAccess.whenPasscodeSetThisDeviceOnly,
+      );
     } catch (e) {
       if (e instanceof Error) {
         simpleAlert(e.message);
       }
     }
+  }
+
+  async askPassword() {
+    return new Promise<string>((resolve) => {
+      alertController.create({
+        header: 'Please enter your password.',
+        inputs: [
+          {
+            type: 'password',
+            name: 'password',
+          },
+        ],
+        buttons: [
+          {
+            text: 'OK',
+            handler({ password }) {
+              resolve(password);
+            },
+          },
+        ],
+      }).then((alert) => {
+        return alert.present();
+      });
+    });
   }
 
   async biometricsAuthenticate() {
@@ -89,9 +143,9 @@ export default new class {
   getIdleInstance() {
     return this.idleInstance = this.idleInstance || idleTimeout(
       () => {
-        // if (isLock.value) {
-        //   return;
-        // }
+        if (isLock.value) {
+          return;
+        }
 
         console.log('Idle timeout, lock screen.');
 
@@ -102,8 +156,8 @@ export default new class {
       {
         element: document.body,
         timeout: IDLE_TIMEOUT,
-        loop: false
-      }
+        loop: false,
+      },
     );
   }
 

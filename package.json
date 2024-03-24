@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@aparajita/capacitor-biometric-auth": "^7.1.1",
+    "@aparajita/capacitor-secure-storage": "^5.2.0",
     "@asika32764/vite-plugin-show-env": "^1.0.3",
     "@asika32764/vue-animate": "^3.0.2",
     "@capacitor-community/barcode-scanner": "^4.0.1",

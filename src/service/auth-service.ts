@@ -5,20 +5,17 @@ import {
   accessTokenStorage,
   encMasterStorage,
   encSecretStorage,
-  kekStorage, refreshTokenStorage,
+  kekStorage,
+  refreshTokenStorage,
   saltStorage,
   userStorage,
 } from '@/store/main-store';
 import { User } from '@/types';
-import {
-  base64UrlDecode,
-  base64UrlEncode,
-  uint82text,
-} from '@/utilities/convert';
+import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import { bigintToHex, hexToBigint, SRPClient } from '@windwalker-io/srp';
-import { bigintToUint8, hexToUint8, uint8ToHex } from 'bigint-toolkit';
+import { hexToBigint, SRPClient } from '@windwalker-io/srp';
 import sodium from 'libsodium-wrappers';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 
 export interface LoginStep1Result {
   A: bigint,
@@ -40,7 +37,7 @@ export default new class AuthService {
         ? async (data, kek, { S }) => {
           const {
             encSecret,
-            encMaster
+            encMaster,
           } = await this.generateUserSecrets(kek);
 
           const keyS = S.toString();
@@ -48,15 +45,18 @@ export default new class AuthService {
           data.encSecret = base64UrlEncode(await sodiumCipher.encrypt(encSecret, keyS));
           data.encMaster = base64UrlEncode(await sodiumCipher.encrypt(encMaster, keyS));
         }
-        : undefined
+        : undefined,
     );
 
     kekStorage.value = secretToolkit.encode(
       data.kek,
-      Encoder.HEX
+      Encoder.HEX,
     );
 
     const S = data.S.toString();
+
+    await SecureStorage.set('salt', hexToBigint(salt).toString());
+    await SecureStorage.set('kek', kekStorage.value);
 
     saltStorage.value = hexToBigint(salt).toString();
     encSecretStorage.value = uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encSecret), S));
@@ -72,7 +72,7 @@ export default new class AuthService {
     const res = await apiClient.post(
       'auth/challenge',
       {
-        email
+        email,
       },
     );
 
@@ -116,7 +116,7 @@ export default new class AuthService {
     return {
       ...res.data.data,
       kek,
-      S
+      S,
     };
   }
 
@@ -154,7 +154,10 @@ export default new class AuthService {
     };
   }
 
-  async runSRPLoginSteps(email: string, password: string, salt: bigint, B: bigint): Promise<LoginStep1Result> {
+  async runSRPLoginSteps(email: string,
+                         password: string,
+                         salt: bigint,
+                         B: bigint): Promise<LoginStep1Result> {
     const srpClient = SRPClient.create();
 
     const { secret: a, public: A, hash: x } = await srpClient.step1(

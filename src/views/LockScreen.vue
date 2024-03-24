@@ -2,28 +2,27 @@
 
 import logo from '@/assets/images/logo-sq-w.svg';
 import lockScreenService from '@/service/lock-screen-service';
-import { noInstantUnlock, userStorage } from '@/store/main-store';
+import { isLock, kekStorage, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { headShake } from '@asika32764/vue-animate';
-import {
-  AndroidBiometryStrength,
-  BiometricAuth,
-  BiometryType,
-} from '@aparajita/capacitor-biometric-auth';
 import {
   IonButton,
   IonContent,
   IonInput,
   IonPage,
-  IonSpinner, onIonViewWillEnter,
+  IonSpinner,
+  onIonViewWillEnter,
   useBackButton,
   useIonRouter,
 } from '@ionic/vue';
 import { type ComponentPublicInstance, onMounted, ref } from 'vue';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 
 const router = useIonRouter();
+const route = useRoute();
 const user = userStorage.value;
 const unlockMode = ref<'biometrics' | 'password'>('password');
 
@@ -35,14 +34,19 @@ useBackButton(500, (e) => {
   console.log('Android back button', e);
 });
 
+onBeforeRouteLeave(() => {
+  return !isLock.value;
+});
+
 onIonViewWillEnter(async () => {
   password.value = import.meta.env.VITE_TEST_PASSWORD || '';
+
   unlockMode.value = enableBiometricsOption.value ? 'biometrics' : 'password';
 
-  if (!noInstantUnlock.value && enableBiometricsOption.value) {
+  if (!noInstantUnlock.value && unlockMode.value === 'biometrics') {
     await biometricsUnlock();
   }
-})
+});
 
 onMounted(async () => {
   document.addEventListener('ionBackButton', (e) => {
@@ -59,6 +63,15 @@ async function biometricsUnlock() {
   try {
     await run(async () => {
       await lockScreenService.biometricsAuthenticate();
+
+      const kek = (await SecureStorage.get('@authman:secure.kek')) as string;
+
+      if (!kek) {
+        throw new Error('You must re-enter your password.');
+      }
+
+      kekStorage.value = kek;
+
       await lockScreenService.unlock();
     }, false);
 
@@ -79,8 +92,9 @@ async function passwordUnlock() {
 
   try {
     await run(async () => {
-        await lockScreenService.passwordAuthenticate(password.value);
-        await lockScreenService.unlock();
+      kekStorage.value = await lockScreenService.passwordAuthenticate(password.value);
+
+      await lockScreenService.unlock();
     }, false);
 
     router.push({ name: 'accounts' });

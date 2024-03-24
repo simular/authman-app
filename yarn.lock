@@ -25,6 +25,17 @@
     "@capacitor/core" "^5.6.0"
     "@capacitor/ios" "^5.6.0"
 
+"@aparajita/capacitor-secure-storage@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@aparajita/capacitor-secure-storage/-/capacitor-secure-storage-5.2.0.tgz#b18f6f051875c98b111f63918e3c88bee244b8b3"
+  integrity sha512-Y+b2/4825mDMDtnZlxLzj87oYcMSTezA+uWZjIZBbLgUcfiBGgUaHdw7PCZzO6PAq9tyh0DtzVpbW+TYLjA1yw==
+  dependencies:
+    "@capacitor/android" "^5.7.3"
+    "@capacitor/app" "^5.0.7"
+    "@capacitor/core" "^5.7.3"
+    "@capacitor/ios" "^5.7.3"
+    async-mutex "^0.5.0"
+
 "@asika32764/vite-plugin-show-env@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@asika32764/vite-plugin-show-env/-/vite-plugin-show-env-1.0.3.tgz#fd85e76792987da30b9adc8722566c78e800ecf4"
@@ -998,12 +1009,12 @@
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-5.7.3.tgz#ded1ab2bec2cff887b5b8a958138f2552e23435a"
   integrity sha512-l4FoagqyoId+D/597fG8pPfmVrNevzWzbtkJkbGtQZS5rqRR4HCNoJn0LAMs812o9bfuxGdE1T3MjpehGOe0Rw==
 
-"@capacitor/android@^5.6.0":
+"@capacitor/android@^5.6.0", "@capacitor/android@^5.7.3":
   version "5.7.4"
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-5.7.4.tgz#e91cb4dd06492ad41f0102a901dd329093610d8c"
   integrity sha512-9ETwrCaLaimLHbwGpgfsPS9cHcPMFLmKFdlYsFsYIusMO6aOrcQTA9Q4xVAkr55ava4Wk+pVRniRYsekrbOLdw==
 
-"@capacitor/app@5.0.7", "@capacitor/app@^5.0.6":
+"@capacitor/app@5.0.7", "@capacitor/app@^5.0.6", "@capacitor/app@^5.0.7":
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-5.0.7.tgz#f71e81320bcd504c400c1f503ba43a88ccac96e8"
   integrity sha512-oad0jwQu+vgQDukeS9UV56yG10dlxkAGGl26IQpZlTmg3dTI9qSJtvhmlLfkF0nEtoj5IsVQUPE+NLH1oZkgGQ==
@@ -1038,7 +1049,7 @@
   dependencies:
     tslib "^2.1.0"
 
-"@capacitor/core@^5.6.0":
+"@capacitor/core@^5.6.0", "@capacitor/core@^5.7.3":
   version "5.7.4"
   resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-5.7.4.tgz#df894775972413982c03fad1ab9e39da38671549"
   integrity sha512-iZBgvx3o4amzKv5ttA+QHB6i7cxK+/mYpCQd1tnSdipg6ZkvfBhg1HkzhEqHk+I7MNur+QwgYDZho9+ycHRwOw==
@@ -1055,7 +1066,7 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-5.7.3.tgz#cdd28634f0b4208fca7a1f6fe2a57b19fc7c333c"
   integrity sha512-ntgayMTQlBZeZiONkqjLGQs2zFVMFghu/hsPcINgXxU53Mvticf2BBNRMmdR20eVHg2UbbJx9SLl8UlOvgQ4sA==
 
-"@capacitor/ios@^5.6.0":
+"@capacitor/ios@^5.6.0", "@capacitor/ios@^5.7.3":
   version "5.7.4"
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-5.7.4.tgz#485db26af1a8b44190466b5379ec16e431052204"
   integrity sha512-tQH24WMSYVKYr/Jl1gFImooQmu8OdXUFHoDaPV1WpZIiwbwxbTdwOXeLlGes5U8B8t7xuxTWMWMDt3IwRlDbhQ==
@@ -2178,6 +2189,13 @@ astral-regex@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/astral-regex/-/astral-regex-2.0.0.tgz#483143c567aeed4785759c0865786dc77d7d2e31"
   integrity sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==
+
+async-mutex@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/async-mutex/-/async-mutex-0.5.0.tgz#353c69a0b9e75250971a64ac203b0ebfddd75482"
+  integrity sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==
+  dependencies:
+    tslib "^2.4.0"
 
 async@^3.2.0:
   version "3.2.5"

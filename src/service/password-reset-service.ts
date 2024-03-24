@@ -2,11 +2,17 @@ import apiClient from '@/service/api-client';
 import { LoginStep1Result } from '@/service/auth-service';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
-import { ApiReturn } from '@/types';
+import {
+  encMasterStorage,
+  encSecretStorage,
+  kekStorage,
+  saltStorage,
+  userStorage,
+} from '@/store/main-store';
+import { ApiReturn, User } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import { SRPClient } from '@windwalker-io/srp';
+import { hexToBigint, SRPClient } from '@windwalker-io/srp';
 import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
 
 export default new class {
@@ -66,11 +72,15 @@ export default new class {
 
     await this.validateEncryptedSecretAndMaster(kek, data.encSecret, data.encMaster, keyS);
 
-    const res = await apiClient.post('password/reset', data);
+    const res = await apiClient.post<ApiReturn<{
+      user: User;
+    }>>('password/reset', data);
 
+    saltStorage.value = salt.toString();
     kekStorage.value = secretToolkit.encode(kek, Encoder.HEX);
     encSecretStorage.value = encSecret;
     encMasterStorage.value = encMaster;
+    userStorage.value = res.data.data.user;
   }
 
   async runSRPClientSteps(

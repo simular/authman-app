@@ -1,5 +1,6 @@
 import { Account, User } from '@/types';
-import { StorageSerializers, useLocalStorage } from '@vueuse/core';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { StorageSerializers, useLocalStorage, useStorage, useStorageAsync } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
 export const mainStore = reactive<{
@@ -10,8 +11,8 @@ export const mainStore = reactive<{
   decryptedAccounts: []
 });
 
-export const accessTokenStorage = useLocalStorage('@authman:access.token', '');
-export const refreshTokenStorage = useLocalStorage('@authman:refresh.token', '');
+export const accessTokenStorage = useStorageAsync('@authman:access.token', '', SecureStorage);
+export const refreshTokenStorage = useStorageAsync('@authman:refresh.token', '', SecureStorage);
 export const userStorage = useLocalStorage<User | null>(
   '@authman:user',
   null,
@@ -21,10 +22,10 @@ export const userStorage = useLocalStorage<User | null>(
 );
 export const isLogin = computed(() => accessTokenStorage.value !== '');
 
-export const saltStorage = useLocalStorage('@authman:salt', '');
-export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
-export const encMasterStorage = useLocalStorage('@authman:enc.master', '');
-export const kekStorage = useLocalStorage('@authman:kek', '');
+export const saltStorage = useStorageAsync('@authman:salt', '', SecureStorage);
+export const encSecretStorage = useStorageAsync('@authman:enc.secret', '', SecureStorage);
+export const encMasterStorage = useStorageAsync('@authman:enc.master', '', SecureStorage);
+export const kekStorage = useStorageAsync('@authman:kek', '', SecureStorage);
 
 export const accountsLoaded = useLocalStorage('@authman:accounts.loaded', false, {
   serializer: StorageSerializers.boolean

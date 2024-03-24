@@ -4,34 +4,46 @@ import authService from '@/service/auth-service';
 import {
   accessTokenStorage,
   encMasterStorage,
-  encSecretStorage,
+  encSecretStorage, isLock, isLogin,
   refreshTokenStorage,
-  userStorage
+  userStorage,
 } from '@/store/main-store';
 import useLoading from '@/utilities/loading';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonButton, IonContent, IonInput, IonPage, IonSpinner, useIonRouter } from '@ionic/vue';
+import {
+  IonButton,
+  IonContent,
+  IonInput,
+  IonPage,
+  IonSpinner,
+  useBackButton,
+  useIonRouter,
+} from '@ionic/vue';
 import { hexToBigint } from '@windwalker-io/srp';
 import { ref } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const router = useIonRouter();
 const email = ref(import.meta.env.VITE_TEST_USERNAME || '');
 const password = ref(import.meta.env.VITE_TEST_PASSWORD || '');
 const { loading, run } = useLoading();
 
+useBackButton(500, (e) => {
+  console.log('Android back button', e);
+});
+
+onBeforeRouteLeave((to) => {
+  if (isLogin.value) {
+    return true;
+  }
+
+  return to.fullPath.startsWith('/auth');
+});
+
 async function authenticate() {
   const result = await run(async () => {
     return authService.login(email.value, password.value);
-    // const { salt, B, sess } = await authService.challenge(email.value);
-    //
-    // return authService.authenticate(
-    //   email.value,
-    //   password.value,
-    //   sess,
-    //   hexToBigint(salt),
-    //   hexToBigint(B)
-    // );
   });
 
   const { user, accessToken, refreshToken } = result;
