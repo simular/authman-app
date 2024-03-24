@@ -45,13 +45,13 @@ async function register() {
     return authService.login(email.value, password.value);
   });
 
-  const { user, accessToken, refreshToken, encSecret, encMaster } = result;
+  // const { user, accessToken, refreshToken, encSecret, encMaster } = result;
 
-  userStorage.value = user;
-  accessTokenStorage.value = accessToken;
-  refreshTokenStorage.value = refreshToken;
-  encSecretStorage.value = encSecret;
-  encMasterStorage.value = encMaster;
+  // userStorage.value = user;
+  // accessTokenStorage.value = accessToken;
+  // refreshTokenStorage.value = refreshToken;
+  // encSecretStorage.value = encSecret;
+  // encMasterStorage.value = encMaster;
 
   const toast = await toastController.create({
     message: 'Your account created.',

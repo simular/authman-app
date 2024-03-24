@@ -1,6 +1,6 @@
 import { Account, User } from '@/types';
 import { StorageSerializers, useLocalStorage } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 export const mainStore = reactive<{
   user?: User;
@@ -21,6 +21,7 @@ export const userStorage = useLocalStorage<User | null>(
 );
 export const isLogin = computed(() => accessTokenStorage.value !== '');
 
+export const saltStorage = useLocalStorage('@authman:salt', '');
 export const encSecretStorage = useLocalStorage('@authman:enc.secret', '');
 export const encMasterStorage = useLocalStorage('@authman:enc.master', '');
 export const kekStorage = useLocalStorage('@authman:kek', '');
@@ -29,3 +30,7 @@ export const accountsLoaded = useLocalStorage('@authman:accounts.loaded', false,
   serializer: StorageSerializers.boolean
 });
 export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:accounts', []);
+
+// Lock
+export const isLock = ref(true);
+export const isManuallyLock = ref(false);

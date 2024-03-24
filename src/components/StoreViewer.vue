@@ -6,9 +6,15 @@ import {
   encSecretStorage,
   isLogin,
   kekStorage, mainStore,
-  refreshTokenStorage,
+  refreshTokenStorage, saltStorage,
   userStorage,
 } from '@/store/main-store';
+import { enableBiometricsOption } from '@/store/options-store';
+import { reactive } from 'vue';
+
+const options = reactive({
+  enableBiometricsOption,
+});
 
 function store(...args: any[]) {
   return 'store-viewer';
@@ -23,9 +29,12 @@ function store(...args: any[]) {
     encMasterStorage,
     encSecretStorage,
     isLogin,
-    kekStorage, mainStore,
+    kekStorage,
+    saltStorage,
+    mainStore,
     refreshTokenStorage,
     userStorage,
+    options,
   )"></div>
 </template>
 

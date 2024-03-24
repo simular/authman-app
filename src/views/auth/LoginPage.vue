@@ -9,6 +9,8 @@ import {
   userStorage
 } from '@/store/main-store';
 import useLoading from '@/utilities/loading';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonButton, IonContent, IonInput, IonPage, IonSpinner, useIonRouter } from '@ionic/vue';
 import { hexToBigint } from '@windwalker-io/srp';
 import { ref } from 'vue';
@@ -59,7 +61,7 @@ async function authenticate() {
           <ion-input label="Email"
             type="email"
             fill="solid"
-            label-placement="stacked"
+            label-placement="floating"
             placeholder="xxx@xxx.xx"
             autocomplete="email"
             v-model="email"
@@ -69,7 +71,7 @@ async function authenticate() {
           <ion-input label="Password"
             type="password"
             fill="solid"
-            label-placement="stacked"
+            label-placement="floating"
             placeholder="**********"
             v-model="password"
           >

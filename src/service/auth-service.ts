@@ -1,7 +1,14 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
+import {
+  accessTokenStorage,
+  encMasterStorage,
+  encSecretStorage,
+  kekStorage, refreshTokenStorage,
+  saltStorage,
+  userStorage,
+} from '@/store/main-store';
 import { User } from '@/types';
 import {
   base64UrlDecode,
@@ -51,8 +58,12 @@ export default new class AuthService {
 
     const S = data.S.toString();
 
+    saltStorage.value = hexToBigint(salt).toString();
     encSecretStorage.value = uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encSecret), S));
     encMasterStorage.value = uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encMaster), S));
+    userStorage.value = data.user;
+    accessTokenStorage.value = data.accessToken;
+    refreshTokenStorage.value = data.refreshToken;
 
     return data;
   }

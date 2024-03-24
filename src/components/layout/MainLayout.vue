@@ -16,6 +16,7 @@ withDefaults(
     title?: string;
     headerCondense?: boolean;
     showMenuButton?: boolean;
+    color?: string;
   }>(),
   {
     headerCondense: false,
@@ -48,7 +49,7 @@ withDefaults(
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <ion-content :color fullscreen>
       <HeaderCondense v-if="title && headerCondense">
         {{ title }}
       </HeaderCondense>

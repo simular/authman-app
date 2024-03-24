@@ -38,5 +38,7 @@ router.isReady().then(async () => {
 
   if (!isLogin.value) {
     router.replace('/auth/login');
+  } else {
+    // router.replace('/lock');
   }
 });
