@@ -2,7 +2,8 @@
 
 import logo from '@/assets/images/logo-sq-w.svg';
 import lockScreenService from '@/service/lock-screen-service';
-import { isManuallyLock, userStorage } from '@/store/main-store';
+import { noInstantUnlock, userStorage } from '@/store/main-store';
+import { enableBiometricsOption } from '@/store/options-store';
 import { simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { headShake } from '@asika32764/vue-animate';
@@ -16,7 +17,7 @@ import {
   IonContent,
   IonInput,
   IonPage,
-  IonSpinner,
+  IonSpinner, onIonViewWillEnter,
   useBackButton,
   useIonRouter,
 } from '@ionic/vue';
@@ -24,6 +25,7 @@ import { type ComponentPublicInstance, onMounted, ref } from 'vue';
 
 const router = useIonRouter();
 const user = userStorage.value;
+const unlockMode = ref<'biometrics' | 'password'>('password');
 
 if (!user) {
   router.replace({ name: 'login' });
@@ -33,16 +35,19 @@ useBackButton(500, (e) => {
   console.log('Android back button', e);
 });
 
-onMounted(async () => {
+onIonViewWillEnter(async () => {
   password.value = import.meta.env.VITE_TEST_PASSWORD || '';
+  unlockMode.value = enableBiometricsOption.value ? 'biometrics' : 'password';
 
+  if (!noInstantUnlock.value && enableBiometricsOption.value) {
+    await biometricsUnlock();
+  }
+})
+
+onMounted(async () => {
   document.addEventListener('ionBackButton', (e) => {
     console.log('ionBackButton', e);
   });
-
-  if (!isManuallyLock.value) {
-    await biometricsUnlock();
-  }
 });
 
 const email = ref(user?.email);
@@ -62,6 +67,8 @@ async function biometricsUnlock() {
     if (e instanceof Error) {
       simpleToast(e.message);
     }
+
+    unlockMode.value = 'password';
 
     passwordInput.value!.$el.setFocus(true);
   }
@@ -101,28 +108,42 @@ async function passwordUnlock() {
         </p>
 
         <div style="width: 100%; display: grid; gap: 1rem;">
-          <ion-input
-            ref="passwordInput"
-            type="password"
-            fill="solid"
-            label-placement="floating"
-            placeholder="Password"
-            v-model="password"
-            error-text="Invalid Password"
-            style="width: 85%; margin-left: auto; margin-right: auto"
-          >
-          </ion-input>
+          <template v-if="unlockMode === 'password'">
+            <ion-input
+              ref="passwordInput"
+              type="password"
+              fill="solid"
+              label-placement="floating"
+              placeholder="Password"
+              v-model="password"
+              error-text="Invalid Password"
+              style="width: 85%; margin-left: auto; margin-right: auto"
+            >
+            </ion-input>
 
-          <ion-button expand="block" @click="passwordUnlock"
-            fill="clear"
-            :disabled="loading || password === ''">
-            <template v-if="!loading">
-              Unlock
-            </template>
-            <template v-else>
-              <ion-spinner name="dots" />
-            </template>
-          </ion-button>
+            <ion-button expand="block" @click="passwordUnlock"
+              fill="clear"
+              :disabled="loading || password === ''">
+              <template v-if="!loading">
+                Unlock
+              </template>
+              <template v-else>
+                <ion-spinner name="dots" />
+              </template>
+            </ion-button>
+          </template>
+          <template v-else>
+            <ion-button expand="block" @click="biometricsUnlock"
+              fill="clear"
+              :disabled="loading">
+              <template v-if="!loading">
+                Unlock
+              </template>
+              <template v-else>
+                <ion-spinner name="dots" />
+              </template>
+            </ion-button>
+          </template>
         </div>
       </div>
     </ion-content>

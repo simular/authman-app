@@ -1,8 +1,9 @@
 import { isLogin } from '@/store/main-store';
 import sodium from 'libsodium-wrappers';
-import { createApp } from 'vue'
+import { createApp, nextTick } from 'vue';
 import App from './App.vue'
 import router from './router';
+import lockScreenService from '@/service/lock-screen-service';
 
 import('@asika32764/vue-animate/dist/vue-animate.css');
 
@@ -35,6 +36,8 @@ router.isReady().then(async () => {
   await sodium.ready;
 
   app.mount('#app');
+
+  lockScreenService.listenIdleTimeout();
 
   if (!isLogin.value) {
     router.replace('/auth/login');

@@ -52,6 +52,7 @@
     "dayjs": "^1.11.10",
     "eslint": "^8.35.0",
     "eslint-plugin-vue": "^9.9.0",
+    "idle-timeout": "^2.0.1",
     "jsdom": "^22.1.0",
     "libsodium-wrappers": "^0.7.13",
     "lodash-es": "^4.17.21",

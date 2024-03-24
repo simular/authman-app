@@ -45,7 +45,7 @@
 import MainLayout from '@/components/layout/MainLayout.vue';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
-import { isManuallyLock } from '@/store/main-store';
+import { noInstantUnlock } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { faFingerprint, faKey, faLock, faSignOut } from '@fortawesome/free-solid-svg-icons';
@@ -65,12 +65,10 @@ watch(enableBiometrics, async (v) => {
   }
 
   enableBiometricsOption.value = enableBiometrics.value;
-
-  console.log(enableBiometricsOption.value);
 });
 
 function lockScreen() {
-  isManuallyLock.value = true;
+  noInstantUnlock.value = true;
 
   lockScreenService.lock();
 }

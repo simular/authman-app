@@ -50,7 +50,7 @@ withDefaults(
     </ion-header>
 
     <ion-content :color fullscreen>
-      <HeaderCondense v-if="title && headerCondense">
+      <HeaderCondense v-if="title && headerCondense" :color>
         {{ title }}
       </HeaderCondense>
 

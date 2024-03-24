@@ -33,4 +33,4 @@ export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:acco
 
 // Lock
 export const isLock = ref(true);
-export const isManuallyLock = ref(false);
+export const noInstantUnlock = ref(false);
