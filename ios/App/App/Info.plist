@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>authman-app</string>
+	<string>authman-app</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,5 +45,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>To be able to scan QRcode</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>To use for unlock app</string>
 </dict>
 </plist>

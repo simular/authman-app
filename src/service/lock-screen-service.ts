@@ -62,6 +62,8 @@ export default new class {
 
   async testBiometrics() {
     try {
+      await this.biometricsAuthenticate();
+
       const password = await this.askPassword();
 
       if (!password) {
@@ -74,8 +76,6 @@ export default new class {
         simpleAlert('Invalid Password');
         return false;
       }
-
-      await this.biometricsAuthenticate();
 
       await SecureStorage.set(
         '@authman:secure.kek',
@@ -98,7 +98,8 @@ export default new class {
   async askPassword() {
     return new Promise<string | false>((resolve) => {
       alertController.create({
-        header: 'Please enter your password.',
+        header: 'Matched',
+        message: 'Please enter master password again.',
         inputs: [
           {
             type: 'password',
