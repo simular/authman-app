@@ -1,4 +1,6 @@
 import router from '@/router';
+import apiClient from '@/service/api-client';
+import authService from '@/service/auth-service';
 import {
   accessTokenStorage,
   accountsLoaded,
@@ -14,6 +16,9 @@ import {
 import { User } from '@/types';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { headShake } from '@asika32764/vue-animate';
+import { alertController, AlertOptions } from '@ionic/vue';
+import { AxiosError } from 'axios';
 
 export default new class UserService {
   async logoutAndRedirect() {
@@ -59,5 +64,124 @@ export default new class UserService {
     kekStorage.value = '';
     saltStorage.value = '';
     userStorage.value = undefined;
+  }
+
+  async touch() {
+    return await apiClient.get('auth/me');
+  }
+
+  async askNewPasswordOrLogout() {
+    const password = await this.askPassword(
+      'Your Password has Changed.',
+      'Please enter new password to continue.',
+      {
+        backdropDismiss: false,
+        buttons: [
+          {
+            text: 'Logout',
+            role: 'logout',
+            handler: () => {
+              this.logoutAndRedirect();
+            }
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            async handler({ password }) {
+              if (!password) {
+                return false;
+              }
+
+              const buttons = Array.from(
+                document.querySelectorAll<HTMLButtonElement>('.alert-button-group button')
+              );
+              const input = document.querySelector<HTMLInputElement>('#input-password')!;
+              input.style.borderColor = '';
+
+              for (const button of buttons) {
+                button.style.opacity = '0.45';
+                button.style.pointerEvents = 'none';
+              }
+
+              try {
+                await authService.login(
+                  userStorage.value?.email || '',
+                  password
+                );
+
+                return password;
+              } catch (e) {
+                console.error(e);
+
+                if (e instanceof Error || e instanceof AxiosError) {
+                  input.style.borderColor = 'var(--ion-color-danger)';
+                  input.setCustomValidity('Invalid password.');
+                  input.reportValidity();
+                  headShake(input);
+
+                  setTimeout(() => {
+                    input.setCustomValidity('');
+                  }, 1000);
+                }
+              } finally {
+                for (const button of buttons) {
+                  button.style.opacity = '1';
+                  button.style.pointerEvents = '';
+                }
+              }
+
+              return false;
+            },
+          },
+        ]
+      }
+    )
+  }
+
+  async askPassword(header = 'Password', message = '', options: AlertOptions = {}) {
+    return new Promise<string | false>((resolve) => {
+      alertController.create({
+        header,
+        message,
+        inputs: [
+          {
+            type: 'password',
+            name: 'password',
+            id: 'input-password'
+          },
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+          },
+        ],
+        ...options
+      })
+        .then((alert) => {
+          alert.onDidDismiss().then((e) => {
+            if (e.role === 'backdrop' || e.role === 'cancel') {
+              resolve(false);
+            }
+
+            if (e.role === 'confirm') {
+              resolve(e.data.values.password);
+            }
+
+            return e;
+          });
+
+          return alert.present();
+        })
+        .then((alert) => {
+          document.querySelector<HTMLInputElement>('#input-password')?.focus();
+
+          return alert;
+        });
+    });
   }
 };

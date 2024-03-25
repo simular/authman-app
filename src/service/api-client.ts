@@ -1,8 +1,9 @@
 
 import userService from '@/service/user-service';
-import { accessTokenStorage, refreshTokenStorage } from '@/store/main-store';
+import { accessTokenStorage, refreshTokenStorage, userStorage } from '@/store/main-store';
 import axiosBase, { AxiosError, type AxiosRequestConfig, type AxiosInstance } from 'axios';
 import { urlTemplateInterceptor } from 'axios-url-template';
+import dayjs from 'dayjs';
 
 const axios: AxiosInstance = axiosBase.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT
@@ -20,6 +21,12 @@ axios.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
     }
+  }
+
+  const user = userStorage.value;
+
+  if (user && user.lastReset) {
+    config.headers['X-Password-Last-Reset'] = dayjs(user.lastReset).unix();
   }
 
   return config;
@@ -41,9 +48,13 @@ axios.interceptors.response.use(
       }
     }
 
-    // Signature invalid, means we may refresh DB migrations, just logout them.
-    if (errCode === 40301) {
-      userService.logoutAndRedirect();
+    // Password may be changed,
+    if (errCode === 40105) {
+      const originalRequest = e.config;
+
+      if (!originalRequest._newPass) {
+        return await askNewPasswordAndRetry(originalRequest);
+      }
     }
 
     const json = e.response?.data;
@@ -101,9 +112,27 @@ async function refreshAndRetry(originalRequest: AxiosRequestConfig) {
   }
 }
 
+async function askNewPasswordAndRetry(originalRequest: AxiosRequestConfig) {
+  originalRequest._newPass = true;
+
+  try {
+    originalRequest.headers = originalRequest.headers || {};
+    await userService.askNewPasswordOrLogout();
+    return axios(originalRequest);
+  } catch (e: any) {
+    if (e instanceof AxiosError) {
+      userService.logoutAndRedirect();
+      return;
+    }
+
+    throw e;
+  }
+}
+
 declare module 'axios' {
   export interface AxiosRequestConfig {
     _noAuth?: boolean;
     _retry?: boolean;
+    _newPass?: boolean;
   }
 }

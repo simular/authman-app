@@ -160,10 +160,12 @@ export default new class AuthService {
     };
   }
 
-  async runSRPLoginSteps(email: string,
-                         password: string,
-                         salt: bigint,
-                         B: bigint): Promise<LoginStep1Result> {
+  async runSRPLoginSteps(
+    email: string,
+    password: string,
+    salt: bigint,
+    B: bigint
+  ): Promise<LoginStep1Result> {
     const srpClient = SRPClient.create();
 
     const { secret: a, public: A, hash: x } = await srpClient.step1(

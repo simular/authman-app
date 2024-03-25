@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import ModalLayout from '@/components/layout/ModalLayout.vue';
+import userService from '@/service/user-service';
 import { simpleAlert } from '@/utilities/alert';
 import { BarcodeScanner, SupportedFormat } from '@capacitor-community/barcode-scanner';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonButton, IonInput, IonItem, IonList } from '@ionic/vue';
+import { IonButton, IonInput, IonItem, IonList, modalController, useIonRouter } from '@ionic/vue';
+import { AxiosError } from 'axios';
 import { trimStart } from 'lodash-es';
 import { ComputedRef, inject, onMounted, ref } from 'vue';
 
@@ -15,7 +17,18 @@ const secret = ref('');
 const title = ref('');
 const host = ref('');
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    await userService.touch();
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      if (e.code === 'ERR_NETWORK') {
+        simpleAlert('To create a new account, network connection is required.');
+        modalController.dismiss();
+      }
+    }
+  }
+
   setTimeout(() => {
     secretInput.value?.$el.setFocus();
   }, 500);

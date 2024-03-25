@@ -1,4 +1,5 @@
 import encryptionService from '@/service/encryption-service';
+import userService from '@/service/user-service';
 import { isLock, kekStorage, noInstantUnlock, saltStorage } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
@@ -9,7 +10,6 @@ import {
 } from '@aparajita/capacitor-biometric-auth';
 import { KeychainAccess, SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Capacitor } from '@capacitor/core';
-import { alertController, useIonRouter } from '@ionic/vue';
 import idleTimeout from 'idle-timeout';
 import IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
@@ -34,7 +34,7 @@ export default new class {
     idleInstance.resume();
   }
 
-  async validatePasswordAndToKek(password: string) {
+  async validatePasswordAndGetKek(password: string) {
     const kek = await encryptionService.deriveKek(
       password,
       secretToolkit.decode(saltStorage.value)
@@ -51,7 +51,7 @@ export default new class {
   }
 
   async passwordAuthenticate(password: string) {
-    const kek = await this.validatePasswordAndToKek(password);
+    const kek = await this.validatePasswordAndGetKek(password);
 
     if (!kek) {
       throw new Error('Invalid password');
@@ -64,13 +64,16 @@ export default new class {
     try {
       await this.biometricsAuthenticate();
 
-      const password = await this.askPassword();
+      const password = await userService.askPassword(
+        'Your Password',
+        'Please enter master password again.'
+      );
 
       if (!password) {
         return false;
       }
 
-      const kek = await this.validatePasswordAndToKek(password);
+      const kek = await this.validatePasswordAndGetKek(password);
 
       if (!kek) {
         simpleAlert('Invalid Password');
@@ -93,40 +96,6 @@ export default new class {
 
       return false;
     }
-  }
-
-  async askPassword() {
-    return new Promise<string | false>((resolve) => {
-      alertController.create({
-        header: 'Matched',
-        message: 'Please enter master password again.',
-        inputs: [
-          {
-            type: 'password',
-            name: 'password',
-          },
-        ],
-        buttons: [
-          {
-            text: 'OK',
-            handler({ password }) {
-              resolve(password);
-            },
-          },
-        ],
-        
-      }).then((alert) => {
-        alert.onDidDismiss().then((e) => {
-          if (e.role === 'backdrop') {
-            resolve(false);
-          }
-
-          return e;
-        });
-        
-        return alert.present();
-      });
-    });
   }
 
   async biometricsAuthenticate() {

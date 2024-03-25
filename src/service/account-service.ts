@@ -10,6 +10,8 @@ import { cloneDeep } from 'lodash-es';
 
 export default new class {
   async save(account: Account) {
+    await userService.touch();
+
     const master = await encryptionService.getMasterKey();
 
     account = cloneDeep(account);
