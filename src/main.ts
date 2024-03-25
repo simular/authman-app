@@ -1,6 +1,6 @@
 import { isLogin } from '@/store/main-store';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 import { createApp, nextTick } from 'vue';
 import App from './App.vue'
 import router from './router';

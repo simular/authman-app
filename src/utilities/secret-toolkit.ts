@@ -1,6 +1,6 @@
 import { uint82text, wrapUint8, } from '@/utilities/convert';
 import { hexToUint8, uint8ToHex } from 'bigint-toolkit';
-import sodium, { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers';
+import sodium, { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers-sumo';
 
 export enum Encoder {
   HEX = 'hex',
@@ -39,7 +39,7 @@ export default new class {
     return encoded;
   }
 
-  decode(str: string) {
+  decode(str: string): Uint8Array {
     const [encoder, encoded] = this.extract(str);
 
     if (encoder === Encoder.HEX) {

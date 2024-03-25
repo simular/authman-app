@@ -15,7 +15,6 @@ import { IonButton, IonInput, IonItem, IonList, useIonRouter } from '@ionic/vue'
 import { useCurrentElement } from '@vueuse/core';
 import { hexToBigint, SRPClient, timingSafeEquals } from '@windwalker-io/srp';
 import { bigintToUint8, hexToUint8, uint8ToHex } from 'bigint-toolkit';
-import { to_base64 } from 'libsodium-wrappers';
 import { ref } from 'vue';
 
 enum PasswordChangeState {
@@ -56,10 +55,10 @@ async function checkCurrentPassword() {
       hexToBigint(B),
     );
 
-    const oldKek = await encryptionService.deriveKek(currentPassword.value, hexToBigint(salt).toString());
+    const oldKek = await encryptionService.deriveKek(currentPassword.value, hexToUint8(salt));
 
     secrets.secret = await encryptionService.getSecretKey(oldKek);
-    secrets.master = await encryptionService.getMasterKeyBySecret(secrets.secret);
+    secrets.master = await encryptionService.getMasterKeyBySecret(secrets.secret!);
   });
 
   state.value = PasswordChangeState.NEW_PASSWORD;

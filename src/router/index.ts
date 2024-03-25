@@ -1,4 +1,3 @@
-import { pageInit } from '@/router/router-hooks';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 

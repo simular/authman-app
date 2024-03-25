@@ -1,21 +1,15 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
-import {
-  accessTokenStorage,
-  encMasterStorage,
-  encSecretStorage,
-  kekStorage,
-  refreshTokenStorage,
-  saltStorage,
-  userStorage,
-} from '@/store/main-store';
+import userService from '@/service/user-service';
+import { accessTokenStorage, kekStorage, refreshTokenStorage } from '@/store/main-store';
 import { User } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { hexToBigint, SRPClient } from '@windwalker-io/srp';
-import sodium from 'libsodium-wrappers';
-import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { AxiosError } from 'axios';
+import { bigintToUint8 } from 'bigint-toolkit';
+import sodium from 'libsodium-wrappers-sumo';
 
 export interface LoginStep1Result {
   A: bigint,
@@ -54,14 +48,16 @@ export default new class AuthService {
     );
 
     const S = data.S.toString();
+    const saltHex = 'hex:' + salt;
 
-    await SecureStorage.set('salt', hexToBigint(salt).toString());
-    await SecureStorage.set('kek', kekStorage.value);
+    await userService.storeUserSecrets(
+      data.user,
+      saltHex,
+      data.kek,
+      uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encSecret), S)),
+      uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encMaster), S)),
+    );
 
-    saltStorage.value = hexToBigint(salt).toString();
-    encSecretStorage.value = uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encSecret), S));
-    encMasterStorage.value = uint82text(await sodiumCipher.decrypt(base64UrlDecode(data.encMaster), S));
-    userStorage.value = data.user;
     accessTokenStorage.value = data.accessToken;
     refreshTokenStorage.value = data.refreshToken;
 
@@ -105,13 +101,13 @@ export default new class AuthService {
     let kek: Uint8Array | undefined = undefined;
 
     if (extra) {
-      kek = await encryptionService.deriveKek(password, salt.toString());
+      kek = await encryptionService.deriveKek(password, bigintToUint8(salt));
       data = (await extra(data, kek, loginResult)) || data;
     }
 
     const res = await this.authenticatePost(data);
 
-    kek = kek || await encryptionService.deriveKek(password, salt.toString());
+    kek = kek || await encryptionService.deriveKek(password, bigintToUint8(salt));
 
     return {
       ...res.data.data,
@@ -136,9 +132,19 @@ export default new class AuthService {
       sess,
     };
 
-    const res = await this.authenticatePost(data);
+    try {
+      const res = await this.authenticatePost(data);
 
-    return { A, M2: res.data.data.proof, S };
+      return { A, M2: res.data.data.proof, S };
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e?.response?.data.code === 40103) {
+          throw new Error('Invalid password.');
+        }
+      }
+
+      throw e;
+    }
   }
 
   async generateUserSecrets(kek: Uint8Array) {

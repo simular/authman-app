@@ -1,5 +1,5 @@
 import { hexToUint8 } from 'bigint-toolkit';
-import { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers';
+import { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers-sumo';
 
 export function text2uint8(str: string) {
   return new TextEncoder().encode(str);

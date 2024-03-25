@@ -2,6 +2,7 @@ import apiClient from '@/service/api-client';
 import { LoginStep1Result } from '@/service/auth-service';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
+import userService from '@/service/user-service';
 import {
   encMasterStorage,
   encSecretStorage,
@@ -12,8 +13,9 @@ import {
 import { ApiReturn, User } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import { hexToBigint, SRPClient } from '@windwalker-io/srp';
-import { bigintToUint8, uint8ToHex } from 'bigint-toolkit';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { SRPClient } from '@windwalker-io/srp';
+import { bigintToHex, bigintToUint8, hexToUint8 } from 'bigint-toolkit';
 
 export default new class {
   async challenge(email: string, password: string) {
@@ -52,7 +54,10 @@ export default new class {
     const loginResult = await this.runSRPClientSteps(email, password, salt, B);
     const { A, M1, S } = loginResult;
 
-    const kek = await encryptionService.deriveKek(password, salt.toString());
+    const saltHex = bigintToHex(salt);
+    const saltUint8 = hexToUint8(saltHex);
+    console.log(saltHex, saltUint8);
+    const kek = await encryptionService.deriveKek(password, saltUint8);
 
     const keyS = S.toString();
 
@@ -76,11 +81,13 @@ export default new class {
       user: User;
     }>>('password/reset', data);
 
-    saltStorage.value = salt.toString();
-    kekStorage.value = secretToolkit.encode(kek, Encoder.HEX);
-    encSecretStorage.value = encSecret;
-    encMasterStorage.value = encMaster;
-    userStorage.value = res.data.data.user;
+    await userService.storeUserSecrets(
+      res.data.data.user,
+      bigintToUint8(salt),
+      kek,
+      encSecret,
+      encMaster,
+    );
   }
 
   async runSRPClientSteps(

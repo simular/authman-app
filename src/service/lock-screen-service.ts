@@ -1,4 +1,3 @@
-import router from '@/router';
 import encryptionService from '@/service/encryption-service';
 import { isLock, kekStorage, noInstantUnlock, saltStorage } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
@@ -10,7 +9,7 @@ import {
 } from '@aparajita/capacitor-biometric-auth';
 import { KeychainAccess, SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Capacitor } from '@capacitor/core';
-import { alertController } from '@ionic/vue';
+import { alertController, useIonRouter } from '@ionic/vue';
 import idleTimeout from 'idle-timeout';
 import IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
@@ -19,13 +18,11 @@ const IDLE_TIMEOUT = (Number(import.meta.env.VITE_IDLE_TIMEOUT) || (5 * 60)) * 1
 export default new class {
   idleInstance?: IdleTimeout;
 
-  async lock() {
+  async handleBeforeLock() {
     isLock.value = true;
     kekStorage.value = '';
     const idleInstance = this.getIdleInstance();
     idleInstance.pause();
-
-    router.replace({ name: 'lock' });
   }
 
   async unlock() {
@@ -38,7 +35,10 @@ export default new class {
   }
 
   async validatePasswordAndToKek(password: string) {
-    const kek = await encryptionService.deriveKek(password, saltStorage.value);
+    const kek = await encryptionService.deriveKek(
+      password,
+      secretToolkit.decode(saltStorage.value)
+    );
 
     try {
       await encryptionService.getSecretKey(kek);
@@ -169,7 +169,7 @@ export default new class {
 
         noInstantUnlock.value = true;
 
-        this.lock();
+        this.handleBeforeLock();
       },
       {
         element: document.body,

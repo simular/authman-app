@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ModalLayout from '@/components/layout/ModalLayout.vue';
 import { simpleAlert } from '@/utilities/alert';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner, SupportedFormat } from '@capacitor-community/barcode-scanner';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonButton, IonInput, IonItem, IonList } from '@ionic/vue';
@@ -22,28 +22,28 @@ onMounted(() => {
 });
 
 async function scanQRCode() {
-  decodeTheUri('otpauth://discord.com/URHOUSE%20%E5%AE%B6%E5%90%88%E4%B8%8D%E5%8B%95%E7%94%A2?secret=KADMZDJH7Y');
-  return;
+  // decodeTheUri('otpauth://discord.com/URHOUSE%20%E5%AE%B6%E5%90%88%E4%B8%8D%E5%8B%95%E7%94%A2?secret=KADMZDJH7Y');
+  // return;
 
-  // if (!await requestPermission()) {
-  //   await permissionAlert();
-  //   BarcodeScanner.openAppSettings();
-  //   return;
-  // }
-  //
-  // document.querySelector('body')?.classList.add('scanner-active');
-  //
-  // BarcodeScanner.hideBackground();
-  //
-  // addClosEvent();
-  //
-  // const result = await BarcodeScanner.startScan({ targetedFormats: [SupportedFormat.QR_CODE] });
-  //
-  // if (result.hasContent) {
-  //   decodeTheUri(result.content);
-  // }
-  //
-  // endScan();
+  if (!await requestPermission()) {
+    await permissionAlert();
+    BarcodeScanner.openAppSettings();
+    return;
+  }
+
+  document.querySelector('body')?.classList.add('scanner-active');
+
+  BarcodeScanner.hideBackground();
+
+  addClosEvent();
+
+  const result = await BarcodeScanner.startScan({ targetedFormats: [SupportedFormat.QR_CODE] });
+
+  if (result.hasContent) {
+    decodeTheUri(result.content);
+  }
+
+  endScan();
 }
 
 async function requestPermission() {

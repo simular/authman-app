@@ -50,8 +50,10 @@ import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { faFingerprint, faKey, faLock, faSignOut } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonItem, IonLabel, IonList, IonNote, IonToggle } from '@ionic/vue';
+import { IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
 import { watch } from 'vue';
+
+const router = useIonRouter();
 
 watch(enableBiometricsOption, async (v) => {
   if (v) {
@@ -66,7 +68,13 @@ watch(enableBiometricsOption, async (v) => {
 function lockScreen() {
   noInstantUnlock.value = true;
 
-  lockScreenService.lock();
+  lockScreenService.handleBeforeLock();
+
+  router.navigate(
+    { name: 'lock' },
+    'forward',
+    'push'
+  );
 }
 
 

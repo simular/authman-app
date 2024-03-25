@@ -75,7 +75,7 @@ async function biometricsUnlock() {
       await lockScreenService.unlock();
     }, false);
 
-    router.push({ name: 'accounts' });
+    router.navigate({ name: 'accounts' }, 'back', 'pop');
   } catch (e) {
     if (e instanceof Error) {
       simpleToast(e.message);
@@ -97,7 +97,7 @@ async function passwordUnlock() {
       await lockScreenService.unlock();
     }, false);
 
-    router.push({ name: 'accounts' });
+    router.navigate({ name: 'accounts' }, 'back', 'pop');
   } catch (e) {
     passwordInput.value!.$el.classList.add('ion-invalid', 'ion-touched');
 

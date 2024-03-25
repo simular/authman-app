@@ -1,12 +1,12 @@
 import { sodiumCipher } from '@/service/cipher';
 import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
-import { base64UrlDecode } from '@/utilities/convert';
+import { base64UrlDecode, wrapUint8 } from '@/utilities/convert';
 import { hashPbkdf2 } from '@/utilities/crypto';
 import secretToolkit from '@/utilities/secret-toolkit';
 import { uint8ToHex } from 'bigint-toolkit';
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 
-export const KEK_ITERATION_TIMES = 500000;
+// @see https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html (2024)
 // export const SALT_LENGTH = 16;
 
 export default new class EncryptionService {
@@ -14,7 +14,17 @@ export default new class EncryptionService {
    * Key Derivation Function (KDF)
    */
   async deriveKek(password: Uint8Array | string, salt: Uint8Array | string) {
-    return hashPbkdf2('SHA-256', password, salt, KEK_ITERATION_TIMES, 32);
+    password = wrapUint8(password);
+    salt = wrapUint8(salt);
+
+    return sodium.crypto_pwhash(
+      32,
+      password,
+      salt,
+      sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+      sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+      sodium.crypto_pwhash_ALG_DEFAULT
+    );
   }
 
   async getSecretAndMaster(kek?: Uint8Array | string) {

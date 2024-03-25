@@ -1,5 +1,5 @@
 import { wrapUint8 } from '@/utilities/convert';
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 
 export async function hashPbkdf2(
   algo: string,
