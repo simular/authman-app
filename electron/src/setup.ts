@@ -108,6 +108,7 @@ export class ElectronCapacitorApp {
     // Setup preload script path and construct our main window.
     const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload.js');
     this.MainWindow = new BrowserWindow({
+      title: 'Authman',
       icon,
       show: false,
       x: this.mainWindowState.x,
@@ -222,11 +223,11 @@ export function setupContentSecurityPolicy(customScheme: string): void {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
-          electronIsDev
-            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:`
-            : `default-src ${customScheme}://* 'unsafe-inline' data:`,
-        ],
+        // 'Content-Security-Policy': [
+        //   electronIsDev
+        //     ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:`
+        //     : `default-src ${customScheme}://* 'unsafe-inline' data:`,
+        // ],
       },
     });
   });
