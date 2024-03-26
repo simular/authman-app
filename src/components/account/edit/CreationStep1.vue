@@ -2,7 +2,7 @@
 import ModalLayout from '@/components/layout/ModalLayout.vue';
 import userService from '@/service/user-service';
 import { simpleAlert } from '@/utilities/alert';
-import { BarcodeScanner, SupportedFormat } from '@capacitor-community/barcode-scanner';
+import { BarcodeFormat, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonButton, IonInput, IonItem, IonList, modalController, useIonRouter } from '@ionic/vue';
@@ -42,29 +42,33 @@ async function scanQRCode() {
 
   if (!await requestPermission()) {
     await permissionAlert();
-    BarcodeScanner.openAppSettings();
+    BarcodeScanner.openSettings();
     return;
   }
 
   document.querySelector('body')?.classList.add('scanner-active');
 
-  BarcodeScanner.hideBackground();
+  // BarcodeScanner.hideBackground();
 
   addClosEvent();
 
-  const result = await BarcodeScanner.startScan();
+  const listener = BarcodeScanner.addListener(
+    'barcodeScanned',
+    async (result) => {
+      await listener.remove();
 
-  if (result.hasContent) {
-    decodeTheUri(result.content);
-  }
+      await stopScan();
 
-  endScan();
+      decodeTheUri(result.barcode.rawValue);
+    }
+  );
+
+  await BarcodeScanner.startScan({ formats: [BarcodeFormat.QrCode] });
 }
 
 async function requestPermission() {
-  const result = await BarcodeScanner.checkPermission({ force: true });
-  console.log('Result', result);
-  return Boolean(result.granted || result.neverAsked);
+  const { camera } = await BarcodeScanner.requestPermissions();
+  return Boolean(camera === 'granted');
 }
 
 function permissionAlert() {
@@ -75,7 +79,7 @@ function permissionAlert() {
 }
 
 async function stopScan() {
-  await BarcodeScanner.showBackground();
+  // await BarcodeScanner.showBackground();
   await BarcodeScanner.stopScan();
   endScan();
 }

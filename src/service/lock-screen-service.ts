@@ -107,7 +107,7 @@ export default new class {
     }
 
     const info = await BiometricAuth.checkBiometry();
-
+    console.log(info);
     if (!info.isAvailable) {
       throw new Error('Touch ID or Face ID not available.');
     }

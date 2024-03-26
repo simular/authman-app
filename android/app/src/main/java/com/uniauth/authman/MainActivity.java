@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.uniauth.authman;
 
 import com.getcapacitor.BridgeActivity;
 

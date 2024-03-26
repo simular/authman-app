@@ -15,7 +15,7 @@ dependencies {
     implementation project(':capacitor-status-bar')
     implementation project(':aparajita-capacitor-biometric-auth')
     implementation project(':aparajita-capacitor-secure-storage')
-    implementation project(':capacitor-community-barcode-scanner')
+    implementation project(':capacitor-mlkit-barcode-scanning')
 
 }
 
