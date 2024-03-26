@@ -35,6 +35,8 @@ onMounted(async () => {
 });
 
 async function scanQRCode() {
+  await stopScan();
+
   // decodeTheUri('otpauth://discord.com/URHOUSE%20%E5%AE%B6%E5%90%88%E4%B8%8D%E5%8B%95%E7%94%A2?secret=KADMZDJH7Y');
   // return;
 
@@ -50,7 +52,7 @@ async function scanQRCode() {
 
   addClosEvent();
 
-  const result = await BarcodeScanner.startScan({ targetedFormats: [SupportedFormat.QR_CODE] });
+  const result = await BarcodeScanner.startScan();
 
   if (result.hasContent) {
     decodeTheUri(result.content);
@@ -61,7 +63,7 @@ async function scanQRCode() {
 
 async function requestPermission() {
   const result = await BarcodeScanner.checkPermission({ force: true });
-
+  console.log('Result', result);
   return Boolean(result.granted || result.neverAsked);
 }
 
@@ -72,9 +74,9 @@ function permissionAlert() {
   );
 }
 
-function stopScan() {
-  BarcodeScanner.showBackground();
-  BarcodeScanner.stopScan();
+async function stopScan() {
+  await BarcodeScanner.showBackground();
+  await BarcodeScanner.stopScan();
   endScan();
 }
 
@@ -95,8 +97,10 @@ function decodeTheUri(uri: string) {
     simpleAlert('Wrong account URI');
     return;
   }
-
-  const path = trimStart(url.pathname, '/').split('/');
+  
+  const path = trimStart(url.host + '/' + url.pathname, '/')
+    .split('/')
+    .filter((seg) => seg !== '');
 
   host.value = path[0];
   secret.value = url.searchParams.get('secret') || '';

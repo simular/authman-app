@@ -3,6 +3,7 @@
 import logo from '@/assets/images/logo-sq-w.svg';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
+import { srpClient } from '@/service/srp';
 import {
   accessTokenStorage,
   encMasterStorage,
@@ -22,7 +23,7 @@ const password = ref('1234');
 const { loading, run } = useLoading();
 
 async function register() {
-  const client = SRPClient.create();
+  const client = srpClient();
 
   const result = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);

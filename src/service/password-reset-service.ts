@@ -2,24 +2,15 @@ import apiClient from '@/service/api-client';
 import { LoginStep1Result } from '@/service/auth-service';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
+import { srpClient } from '@/service/srp';
 import userService from '@/service/user-service';
-import {
-  encMasterStorage,
-  encSecretStorage,
-  kekStorage,
-  saltStorage,
-  userStorage,
-} from '@/store/main-store';
 import { ApiReturn, User } from '@/types';
 import { base64UrlDecode, base64UrlEncode, uint82text } from '@/utilities/convert';
-import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import { SecureStorage } from '@aparajita/capacitor-secure-storage';
-import { SRPClient } from '@windwalker-io/srp';
 import { bigintToHex, bigintToUint8, hexToUint8 } from 'bigint-toolkit';
 
 export default new class {
   async challenge(email: string, password: string) {
-    const client = SRPClient.create();
+    const client = srpClient();
 
     const { salt, verifier } = await client.register(email, password);
 
@@ -37,7 +28,7 @@ export default new class {
     return {
       ...res.data.data,
       salt,
-      verifier
+      verifier,
     };
   }
 
@@ -94,17 +85,17 @@ export default new class {
     email: string,
     password: string,
     salt: bigint,
-    B: bigint
+    B: bigint,
   ): Promise<LoginStep1Result> {
-    const srpClient = SRPClient.create();
+    const client = srpClient();
 
-    const { secret: a, public: A, hash: x } = await srpClient.step1(
+    const { secret: a, public: A, hash: x } = await client.step1(
       email,
       password,
       salt,
     );
 
-    const { key: K, proof: M1, preMasterSecret: S } = await srpClient.step2(
+    const { key: K, proof: M1, preMasterSecret: S } = await client.step2(
       email,
       salt,
       A,

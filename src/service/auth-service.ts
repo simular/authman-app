@@ -1,6 +1,7 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
+import { srpClient } from '@/service/srp';
 import userService from '@/service/user-service';
 import { accessTokenStorage, kekStorage, refreshTokenStorage } from '@/store/main-store';
 import { User } from '@/types';
@@ -166,15 +167,15 @@ export default new class AuthService {
     salt: bigint,
     B: bigint
   ): Promise<LoginStep1Result> {
-    const srpClient = SRPClient.create();
+    const client = srpClient();
 
-    const { secret: a, public: A, hash: x } = await srpClient.step1(
+    const { secret: a, public: A, hash: x } = await client.step1(
       email,
       password,
       salt,
     );
 
-    const { key: K, proof: M1, preMasterSecret: S } = await srpClient.step2(
+    const { key: K, proof: M1, preMasterSecret: S } = await client.step2(
       email,
       salt,
       A,

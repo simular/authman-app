@@ -38,6 +38,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/vue-fontawesome": "^3.0.6",
+    "@noble/hashes": "^1.4.0",
     "@types/libsodium-wrappers": "^0.7.13",
     "@types/libsodium-wrappers-sumo": "^0.7.8",
     "@types/lodash-es": "^4.17.12",

@@ -25,8 +25,8 @@ class SodiumCipher {
 
     const nonce = sodium.randombytes_buf(this.NONCE_SIZE);
     const salt = sodium.randombytes_buf(this.SALT_SIZE);
-    const encKey = await this.deriveHkdf(key, 'Enc', salt);
-    const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
+    const encKey = await this.deriveSubKey(key, 'Enc', salt);
+    const hmacKey = await this.deriveSubKey(key, 'Auth', salt);
 
     const enc = sodium.crypto_secretbox_easy(str, nonce, encKey);
 
@@ -51,8 +51,8 @@ class SodiumCipher {
 
     const hmac = str.slice(current);
 
-    const encKey = await this.deriveHkdf(key, 'Enc', salt);
-    const hmacKey = await this.deriveHkdf(key, 'Auth', salt);
+    const encKey = await this.deriveSubKey(key, 'Enc', salt);
+    const hmacKey = await this.deriveSubKey(key, 'Auth', salt);
 
     sodium.memzero(str);
 
@@ -83,7 +83,7 @@ class SodiumCipher {
     );
   }
 
-  deriveHkdf(
+  deriveSubKey(
     key: Uint8Array | string,
     info: Uint8Array | string = '',
     salt: Uint8Array | string = ''
