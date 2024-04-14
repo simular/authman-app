@@ -1,5 +1,5 @@
 <template>
-  <MainLayout title="Options" show-menu-button header-condense color="light">
+  <MainLayout show-menu-button color="light">
     <ion-list style="margin-bottom: 2rem" inset>
       <ion-item>
         <FontAwesomeIcon :icon="faFingerprint" slot="start" />

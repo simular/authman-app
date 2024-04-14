@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logo from '@/assets/images/logo-sq-w.svg';
+import logo from '@/assets/images/logo-dark.svg';
 import authService from '@/service/auth-service';
 import {
   accessTokenStorage,

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import logoDark from '@/assets/images/logo-h-dark.svg';
+import logoLight from '@/assets/images/logo-h-light.svg';
 import HeaderCondense from '@/components/layout/HeaderCondense.vue';
 import {
   IonBackButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonImg,
   IonMenuButton,
   IonPage,
   IonTitle,
@@ -33,13 +36,15 @@ withDefaults(
         <div slot="start">
           <slot name="start">
             <ion-buttons>
-              <ion-menu-button v-if="showMenuButton"></ion-menu-button>
+              <ion-menu-button class="c-button c-button--menu" v-if="showMenuButton"></ion-menu-button>
               <ion-back-button v-else></ion-back-button>
+              <ion-img v-if="!headerCondense && !title" class="only-dark" :src="logoDark"
+                style="height: 48px" />
             </ion-buttons>
           </slot>
         </div>
 
-        <ion-title class="text-center">{{ title }}</ion-title>
+        <ion-title v-if="title" class="text-center">{{ title }}</ion-title>
 
         <div slot="end">
           <slot name="end">
