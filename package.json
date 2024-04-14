@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "resources": "capacitor-resources -p android,ios --transform-splash cover"
   },
   "dependencies": {
     "@capacitor/android": "5.7.3",
@@ -51,6 +52,7 @@
     "axios": "^1.6.7",
     "axios-url-template": "^1.0.3",
     "bigint-toolkit": "^0.2.0",
+    "capacitor-resources": "^2.0.5",
     "cypress": "^13.5.0",
     "dayjs": "^1.11.10",
     "eslint": "^8.35.0",
