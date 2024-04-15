@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import logoDark from '@/assets/images/logo-h-dark.svg';
-import logoLight from '@/assets/images/logo-h-light.svg';
 import HeaderCondense from '@/components/layout/HeaderCondense.vue';
 import {
   IonBackButton,

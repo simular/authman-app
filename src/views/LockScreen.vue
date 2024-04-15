@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import logo from '@/assets/images/logo-sq-w.svg';
+import logo from '@/assets/images/logo-dark.svg';
 import lockScreenService from '@/service/lock-screen-service';
 import { isLock, kekStorage, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
