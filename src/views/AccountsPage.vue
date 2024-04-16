@@ -52,10 +52,13 @@
             class="c-account-card"
             button
             :class="{ active: isSelected(item.id) }">
-            <ion-checkbox class="c-account-card__checkbox"
+            <!-- Checkbox -->
+            <ion-checkbox v-if="selectMode"
+              class="c-account-card__checkbox"
               :checked="isSelected(item.id)"
             />
 
+            <!-- Card Content -->
             <ion-card-content>
               <div class="c-account-card__icon ion-text-center ion-padding">
                 <img :src="item.content.image" alt="img">
