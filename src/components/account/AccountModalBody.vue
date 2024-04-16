@@ -26,7 +26,7 @@ const props = defineProps<{
   </ion-content>
 
   <template #footer>
-    <ion-toolbar>
+    <ion-toolbar style="--ion-safe-area-bottom: 0">
       <ion-buttons slot="start">
         <ion-button @click="$emit('edit')">
           <FontAwesomeIcon :icon="faEdit" style="margin-right: .5rem" />

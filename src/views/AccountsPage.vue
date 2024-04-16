@@ -20,7 +20,8 @@
     <template #primary>
       <ion-buttons>
         <template v-if="selectMode">
-          <ion-button color="danger" @click="deleteAccounts(selectedAccounts)">
+          <ion-button color="danger" @click="deleteAccounts(selectedAccounts)"
+            :disabled="selectedAccounts.length === 0">
             <FontAwesomeIcon :icon="faTrash" style="margin-right: .25rem" />
             <span>Delete {{ selectedAccounts.length > 0 ? `(${selectedAccounts.length})` : '' }}</span>
           </ion-button>
@@ -46,17 +47,20 @@
         <ion-col v-for="item of items" :key="item.id"
           size="6" size-md="4" size-lg="3"
         >
-
           <!-- Account Card -->
           <ion-card @click="selectAccount(item)"
-            :color="isSelected(item.id) ? 'primary' : ''"
+            class="c-account-card"
             button
-            style="margin: 0; height: 100%">
+            :class="{ active: isSelected(item.id) }">
+            <ion-checkbox class="c-account-card__checkbox"
+              :checked="isSelected(item.id)"
+            />
+
             <ion-card-content>
-              <div class="ion-text-center ion-padding">
-                <img :src="item.content.image" alt="img" style="width: 56px; aspect-ratio: 1">
+              <div class="c-account-card__icon ion-text-center ion-padding">
+                <img :src="item.content.image" alt="img">
               </div>
-              <div class="line-clamp">
+              <div class="c-account-card__title line-clamp">
                 <h4>{{ item.content.title }}</h4>
               </div>
             </ion-card-content>
@@ -264,6 +268,26 @@ async function deleteAccounts(accounts: Account[]) {
     --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
     //--border-radius: 16px;
     //--box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+}
+
+.c-account-card {
+  margin: 0;
+  height: 100%;
+
+  &.active {
+    box-shadow: 0 0 2px 1px rgba(var(--ion-color-primary-rgb), .75);
+  }
+
+  &__checkbox {
+    position: absolute;
+    left: .5rem;
+    top: .5rem
+  }
+
+  &__icon img {
+    width: 56px;
+    aspect-ratio: 1;
   }
 }
 </style>
