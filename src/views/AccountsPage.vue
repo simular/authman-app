@@ -1,23 +1,31 @@
 <template>
   <MainLayout show-menu-button>
-    <template #end>
+    <template #secondary>
       <ion-buttons>
         <template v-if="selectMode">
           <ion-button @click="selectMode = false">
             <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
             <span>Cancel</span>
           </ion-button>
+        </template>
+        <template v-else>
+          <ion-button @click="selectMode = true">
+            <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
+            <span>Edit</span>
+          </ion-button>
+        </template>
+      </ion-buttons>
+    </template>
+
+    <template #primary>
+      <ion-buttons>
+        <template v-if="selectMode">
           <ion-button color="danger" @click="deleteAccounts(selectedAccounts)">
             <FontAwesomeIcon :icon="faTrash" style="margin-right: .25rem" />
             <span>Delete {{ selectedAccounts.length > 0 ? `(${selectedAccounts.length})` : '' }}</span>
           </ion-button>
         </template>
         <template v-else>
-          <ion-button @click="selectMode = true">
-            <FontAwesomeIcon :icon="faCheckCircle" style="margin-right: .25rem" />
-            <span>Select</span>
-          </ion-button>
-
           <ion-button @click="createAccount">
             <FontAwesomeIcon :icon="faPlus" style="margin-right: .25rem" />
             <span>New</span>

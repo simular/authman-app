@@ -2,6 +2,7 @@
 import logoDark from '@/assets/images/logo-h-dark.svg';
 import HeaderCondense from '@/components/layout/HeaderCondense.vue';
 import {
+  getPlatforms,
   IonBackButton,
   IonButtons,
   IonContent,
@@ -13,7 +14,7 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string;
     headerCondense?: boolean;
@@ -26,6 +27,8 @@ withDefaults(
   },
 );
 
+const isMobile = getPlatforms().includes('mobile');
+
 </script>
 
 <template>
@@ -35,15 +38,35 @@ withDefaults(
         <div slot="start">
           <slot name="start">
             <ion-buttons>
-              <ion-menu-button class="c-button c-button--menu" v-if="showMenuButton"></ion-menu-button>
+              <ion-menu-button class="c-button c-button--menu" v-if="showMenuButton && !isMobile"></ion-menu-button>
               <ion-back-button v-else></ion-back-button>
-              <ion-img v-if="!headerCondense && !title" class="only-dark" :src="logoDark"
-                style="height: 48px" />
             </ion-buttons>
           </slot>
         </div>
 
-        <ion-title v-if="title" class="text-center">{{ title }}</ion-title>
+        <div slot="primary">
+          <slot name="primary">
+            <ion-buttons>
+
+            </ion-buttons>
+          </slot>
+        </div>
+
+        <div slot="secondary">
+          <slot name="secondary">
+
+          </slot>
+        </div>
+
+        <ion-title class="">
+          <template v-if="title">
+            {{ title }}
+          </template>
+          <template v-if="!headerCondense && !title">
+            <ion-img class="only-dark" :src="logoDark"
+              style="height: 48px; display: inline-block;" />
+          </template>
+        </ion-title>
 
         <div slot="end">
           <slot name="end">
@@ -64,6 +87,10 @@ withDefaults(
 
       <slot></slot>
     </ion-content>
+
+    <template v-if="$slots.footer">
+      <slot name="footer" slot="footer"></slot>
+    </template>
   </ion-page>
 </template>
 
