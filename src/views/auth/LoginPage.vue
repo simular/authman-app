@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo-dark.svg';
 import authService from '@/service/auth-service';
-import {
-  accessTokenStorage,
-  encMasterStorage,
-  encSecretStorage, isLock, isLogin,
-  refreshTokenStorage,
-  userStorage,
-} from '@/store/main-store';
+import { accessTokenStorage, isLogin, refreshTokenStorage, userStorage } from '@/store/main-store';
 import useLoading from '@/utilities/loading';
-import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   IonButton,
   IonContent,
@@ -20,7 +12,6 @@ import {
   useBackButton,
   useIonRouter,
 } from '@ionic/vue';
-import { hexToBigint } from '@windwalker-io/srp';
 import { ref } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 

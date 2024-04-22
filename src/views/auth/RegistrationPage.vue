@@ -1,25 +1,26 @@
 <script setup lang="ts">
 
 import logo from '@/assets/images/logo-sq-w.svg';
+import { default as vPasswordStrength } from '@/directive/password-strength';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
 import { srpClient } from '@/service/srp';
-import {
-  accessTokenStorage,
-  encMasterStorage,
-  encSecretStorage,
-  refreshTokenStorage,
-  userStorage
-} from '@/store/main-store';
 import { User } from '@/types';
 import useLoading from '@/utilities/loading';
-import { IonButton, IonContent, IonInput, IonPage, IonSpinner, toastController, useIonRouter, } from '@ionic/vue';
-import { SRPClient } from '@windwalker-io/srp';
+import {
+  IonButton,
+  IonContent,
+  IonInput,
+  IonPage,
+  IonSpinner,
+  toastController,
+  useIonRouter,
+} from '@ionic/vue';
 import { ref } from 'vue';
 
 const router = useIonRouter();
-const email = ref('test@test.com');
-const password = ref('1234');
+const email = ref(import.meta.env.VITE_TEST_REGISTER_USERNAME || '');
+const password = ref(import.meta.env.VITE_TEST_REGISTER_PASSWORD || '');
 const { loading, run } = useLoading();
 
 async function register() {
@@ -40,19 +41,11 @@ async function register() {
         email: email.value,
         salt: salt.toString(16),
         verifier: verifier.toString(16),
-      }
+      },
     );
 
     return authService.login(email.value, password.value);
   });
-
-  // const { user, accessToken, refreshToken, encSecret, encMaster } = result;
-
-  // userStorage.value = user;
-  // accessTokenStorage.value = accessToken;
-  // refreshTokenStorage.value = refreshToken;
-  // encSecretStorage.value = encSecret;
-  // encMasterStorage.value = encMaster;
 
   const toast = await toastController.create({
     message: 'Your account created.',
@@ -92,13 +85,13 @@ async function register() {
           </ion-input>
 
           <ion-input label="Password"
+            v-password-strength
             type="password"
             fill="solid"
             label-placement="stacked"
             placeholder=""
             v-model="password"
-          >
-          </ion-input>
+          />
 
           <ion-button expand="block" @click="register"
             :disabled="loading">
