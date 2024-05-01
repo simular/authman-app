@@ -117,7 +117,7 @@ import {
   IonButton,
   IonButtons,
   IonCard,
-  IonCardContent,
+  IonCardContent, IonCheckbox,
   IonCol,
   IonGrid,
   IonModal,

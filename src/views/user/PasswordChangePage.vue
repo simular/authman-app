@@ -2,6 +2,7 @@
 
 import MainLayout from '@/components/layout/MainLayout.vue';
 import { default as vPasswordStrength } from '@/directive/password-strength';
+import { default as vValidation } from '@/directive/validation';
 import authService from '@/service/auth-service';
 import encryptionService from '@/service/encryption-service';
 import passwordResetService from '@/service/password-reset-service';
@@ -9,16 +10,26 @@ import { userStorage } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { sleep } from '@/utilities/timing';
-import { IonButton, IonInput, IonItem, IonList, useIonRouter } from '@ionic/vue';
+import { IonButton, IonInput, IonItem, IonList, onIonViewDidEnter, useIonRouter } from '@ionic/vue';
 import { useCurrentElement } from '@vueuse/core';
 import { hexToBigint, timingSafeEquals } from '@windwalker-io/srp';
 import { hexToUint8, uint8ToHex } from 'bigint-toolkit';
-import { ref } from 'vue';
+import { ComponentPublicInstance, ref } from 'vue';
 
 enum PasswordChangeState {
   ENTER_ORIGINAL,
   NEW_PASSWORD
 }
+
+onIonViewDidEnter(() => {
+  currentPassword.value = '';
+  newPassword.value = '';
+  state.value = PasswordChangeState.ENTER_ORIGINAL;
+
+  if (currentPasswordInput.value) {
+    currentPasswordInput.value!.$el.errorText = '';
+  }
+});
 
 const router = useIonRouter();
 const state = ref(PasswordChangeState.ENTER_ORIGINAL);
@@ -27,6 +38,7 @@ const { loading, run } = useLoading();
 const el = useCurrentElement<HTMLElement>();
 const newPassword = ref('');
 const currentPassword = ref('');
+const currentPasswordInput = ref<ComponentPublicInstance<typeof IonInput>>();
 const currentSecret = ref('');
 let secrets: {
   salt?: Uint8Array;
@@ -45,23 +57,35 @@ async function checkCurrentPassword() {
   await run(async () => {
     const { salt, B, sess } = await authService.challenge(user.email);
 
-    await authService.authenticateForPasswordChange(
-      user.email,
-      currentPassword.value,
-      sess,
-      hexToBigint(salt),
-      hexToBigint(B),
-    );
+    try {
+      await authService.authenticateForPasswordChange(
+        user.email,
+        currentPassword.value,
+        sess,
+        hexToBigint(salt),
+        hexToBigint(B),
+      );
+    } catch (e) {
+      console.error(e);
+
+      if (e instanceof Error) {
+        const ionInput = currentPasswordInput.value?.$el as HTMLIonInputElement;
+        const $input = await ionInput.getInputElement();
+        $input.setCustomValidity(e.message);
+        ionInput.dispatchEvent(new CustomEvent('invalid'));
+      }
+      return;
+    }
 
     const oldKek = await encryptionService.deriveKek(currentPassword.value, hexToUint8(salt));
 
     secrets.secret = await encryptionService.getSecretKey(oldKek);
     secrets.master = await encryptionService.getMasterKeyBySecret(secrets.secret!);
-  });
 
-  state.value = PasswordChangeState.NEW_PASSWORD;
+    state.value = PasswordChangeState.NEW_PASSWORD;
 
-  focusFirstInput();
+    focusFirstInput();
+  }, false);
 }
 
 async function checkSecretCode() {
@@ -138,21 +162,23 @@ async function submitNewPassword() {
               Please provide your current password.
             </p>
             <ion-list>
-              <ion-item>
+              <ion-item lines="none">
                 <ion-input
+                  ref="currentPasswordInput"
                   label="Password"
                   label-placement="stacked"
                   type="password"
                   v-model="currentPassword"
                   placeholder="****"
                   autocomplete="current-password"
+                  v-validation
                 />
               </ion-item>
             </ion-list>
 
             <div style="margin-top: 1.5rem">
               <ion-button expand="full" @click="checkCurrentPassword"
-                :disabled="loading">
+                :disabled="loading || currentPassword === ''">
                 Submit
               </ion-button>
             </div>

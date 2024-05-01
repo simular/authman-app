@@ -3,23 +3,24 @@ import icon from '@/assets/images/icon.svg';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
-import { noInstantUnlock } from '@/store/main-store';
+import { noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';
 import {
+  faEnvelope, faFileExport,
   faFingerprint,
   faKey,
   faLock,
-  faShare,
-  faShareAlt, faShareNodes,
-  faSignOut,
+  faShareNodes,
+  faSignOut, faUserAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonImg, IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
 import { watch } from 'vue';
 
 const router = useIonRouter();
+const user = userStorage.value!;
 
 watch(enableBiometricsOption, async (v) => {
   if (v) {
@@ -63,6 +64,7 @@ async function logout() {
   <MainLayout show-menu-button color="light">
     <div class="l-content">
       <ion-list style="" inset>
+        <!-- About -->
         <ion-item button router-link="about">
           <ion-img :src="icon" slot="start" style="height: 1.5rem" />
           <ion-label>
@@ -72,6 +74,7 @@ async function logout() {
       </ion-list>
 
       <ion-list style="" inset>
+        <!-- Biometrics -->
         <ion-item>
           <FontAwesomeIcon :icon="faFingerprint" slot="start" />
           <ion-toggle v-model="enableBiometricsOption">
@@ -80,6 +83,7 @@ async function logout() {
           </ion-toggle>
         </ion-item>
 
+        <!-- Lock Screen -->
         <ion-item button @click="lockScreen">
           <FontAwesomeIcon :icon="faLock" slot="start" />
           <ion-label>
@@ -87,6 +91,7 @@ async function logout() {
           </ion-label>
         </ion-item>
 
+        <!-- Change Password -->
         <ion-item button
           href="password/change"
           router-link="password/change"
@@ -100,7 +105,27 @@ async function logout() {
         </ion-item>
       </ion-list>
 
+      <ion-list style="" inset>
+        <!-- Email -->
+        <ion-item>
+          <FontAwesomeIcon :icon="faUserAlt" slot="start" />
+          <ion-label>
+            <h4>My Email</h4>
+            <ion-note>{{ user.email }}</ion-note>
+          </ion-label>
+        </ion-item>
+
+        <!-- Export -->
+        <ion-item button>
+          <FontAwesomeIcon :icon="faFileExport" slot="start" />
+          <ion-label>
+            Export
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
       <ion-list inset>
+        <!-- Share -->
         <ion-item button @click="share">
           <FontAwesomeIcon :icon="faShareNodes" slot="start">
           </FontAwesomeIcon>
@@ -111,6 +136,7 @@ async function logout() {
       </ion-list>
 
       <ion-list inset>
+        <!-- Logout -->
         <ion-item button @click="logout" style="--color: var(--ion-color-danger)">
           <FontAwesomeIcon :icon="faSignOut" slot="start">
           </FontAwesomeIcon>
@@ -127,6 +153,6 @@ async function logout() {
 .l-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: .75rem;
 }
 </style>
