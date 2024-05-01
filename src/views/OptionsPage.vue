@@ -1,56 +1,22 @@
-<template>
-  <MainLayout show-menu-button color="light">
-    <ion-list style="margin-bottom: 2rem" inset>
-      <ion-item>
-        <FontAwesomeIcon :icon="faFingerprint" slot="start" />
-        <ion-toggle v-model="enableBiometricsOption">
-          <ion-label>Enable Biometrics</ion-label>
-          <ion-note color="medium">Touch ID or Face ID</ion-note>
-        </ion-toggle>
-      </ion-item>
-
-      <ion-item button @click="lockScreen">
-        <FontAwesomeIcon :icon="faLock" slot="start" />
-        <ion-label>
-          Lock Screen
-        </ion-label>
-      </ion-item>
-
-      <ion-item button
-        href="password/change"
-        router-link="password/change"
-        @click.prevent=""
-      >
-        <FontAwesomeIcon :icon="faKey" slot="start">
-        </FontAwesomeIcon>
-        <ion-label>
-          Change Password
-        </ion-label>
-      </ion-item>
-    </ion-list>
-
-    <ion-list inset>
-      <ion-item button @click="logout" style="--color: var(--ion-color-danger)">
-        <FontAwesomeIcon :icon="faSignOut" slot="start">
-        </FontAwesomeIcon>
-        <ion-label>
-          Logout
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </MainLayout>
-</template>
-
 <script setup lang="ts">
+import icon from '@/assets/images/icon.svg';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
 import { noInstantUnlock } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
-import { faFingerprint, faKey, faLock, faSignOut } from '@fortawesome/free-solid-svg-icons';
+import { Share } from '@capacitor/share';
+import {
+  faFingerprint,
+  faKey,
+  faLock,
+  faShare,
+  faShareAlt, faShareNodes,
+  faSignOut,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
+import { IonImg, IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
 import { watch } from 'vue';
 
 const router = useIonRouter();
@@ -77,6 +43,12 @@ function lockScreen() {
   );
 }
 
+async function share() {
+  await Share.share({
+    title: 'Authman App',
+    url: import.meta.env.VITE_INFO_WEBSITE
+  });
+}
 
 async function logout() {
   const v = await simpleConfirm('Do you want to logout?');
@@ -86,3 +58,75 @@ async function logout() {
   }
 }
 </script>
+
+<template>
+  <MainLayout show-menu-button color="light">
+    <div class="l-content">
+      <ion-list style="" inset>
+        <ion-item button router-link="about">
+          <ion-img :src="icon" slot="start" style="height: 1.5rem" />
+          <ion-label>
+            About Authman
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-list style="" inset>
+        <ion-item>
+          <FontAwesomeIcon :icon="faFingerprint" slot="start" />
+          <ion-toggle v-model="enableBiometricsOption">
+            <ion-label>Enable Biometrics</ion-label>
+            <ion-note color="medium">Touch ID or Face ID</ion-note>
+          </ion-toggle>
+        </ion-item>
+
+        <ion-item button @click="lockScreen">
+          <FontAwesomeIcon :icon="faLock" slot="start" />
+          <ion-label>
+            Lock Screen
+          </ion-label>
+        </ion-item>
+
+        <ion-item button
+          href="password/change"
+          router-link="password/change"
+          @click.prevent=""
+        >
+          <FontAwesomeIcon :icon="faKey" slot="start">
+          </FontAwesomeIcon>
+          <ion-label>
+            Change Password
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-list inset>
+        <ion-item button @click="share">
+          <FontAwesomeIcon :icon="faShareNodes" slot="start">
+          </FontAwesomeIcon>
+          <ion-label>
+            Share
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-list inset>
+        <ion-item button @click="logout" style="--color: var(--ion-color-danger)">
+          <FontAwesomeIcon :icon="faSignOut" slot="start">
+          </FontAwesomeIcon>
+          <ion-label>
+            Logout
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </MainLayout>
+</template>
+
+<style scoped lang="scss">
+.l-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>

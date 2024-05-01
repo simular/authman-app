@@ -20,6 +20,7 @@ const props = withDefaults(
     headerCondense?: boolean;
     showMenuButton?: boolean;
     color?: string;
+    defaultBack?: any;
   }>(),
   {
     headerCondense: false,
@@ -39,7 +40,7 @@ const isMobile = getPlatforms().includes('mobile');
           <slot name="start">
             <ion-buttons>
               <ion-menu-button class="c-button c-button--menu" v-if="showMenuButton && !isMobile"></ion-menu-button>
-              <ion-back-button v-else></ion-back-button>
+              <ion-back-button v-else :default-href="defaultBack"></ion-back-button>
             </ion-buttons>
           </slot>
         </div>

@@ -1309,6 +1309,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor/keyboard/-/keyboard-5.0.8.tgz#b8cc21bd6e06273ec61974be9d7f4d8c421a63a4"
   integrity sha512-XYyBzGlzjgLPqyPVdu5McGLYV6+G2efVR4I3l5cF1B27M6U/oFqv9CQU74WNG08nee28bfccboNpv6eWCLYn1A==
 
+"@capacitor/share@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/share/-/share-6.0.0.tgz#fe53f8619c2cccc16afdbe46d17714076d60dda6"
+  integrity sha512-Doqvtxe9tejkjq+P9hZzDslR6VetM02R6N61GBavVBWkQj4N+xWNDA8zISG3PzuGBffGtTfHC6L0W+XySFY5nw==
+
 "@capacitor/status-bar@5.0.7":
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/@capacitor/status-bar/-/status-bar-5.0.7.tgz#a341e8dec9f93769bed4a42e8ad397e5df1b5287"
