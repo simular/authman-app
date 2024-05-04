@@ -14,7 +14,8 @@ export default defineConfig(({ mode}) => {
       showEnv([
         'VITE_API_ENDPOINT',
         'VITE_TEST_USERNAME',
-        'VITE_TEST_PASSWORD'
+        'VITE_TEST_PASSWORD',
+        'VITE_LOCK_SCREEN_AT_STARTUP'
       ]),
       mode === 'production'
         ? undefined

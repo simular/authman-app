@@ -43,7 +43,7 @@ router.isReady().then(async () => {
 
   if (!isLogin.value) {
     router.replace('/auth/login');
-  } else {
+  } else if (import.meta.env.VITE_LOCK_SCREEN_AT_STARTUP === '1') {
     router.replace('/lock');
   }
 });
