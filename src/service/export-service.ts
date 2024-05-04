@@ -1,36 +1,19 @@
 import accountService from '@/service/account-service';
-import localAuthService from '@/service/local-auth-service';
 import { userStorage } from '@/store/main-store';
-import { FileOpener } from '@capacitor-community/file-opener';
+import { useLoadingOverlay } from '@/utilities/loading';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { FileOpener } from '@capawesome-team/capacitor-file-opener';
 
 export default new class {
   async export() {
-    const kek = await localAuthService.auth();
+    const { run } = await useLoadingOverlay('Exporting...');
 
-    const accounts = (await accountService.getAccounts())!;
+    const json = await run(async () => {
+      return this.readAccountsToJson();
+    });
 
-    const items = await accountService.decryptAccounts(accounts);
-    const user = userStorage.value!;
-    let appInfo = undefined;
-
-    try {
-      appInfo = await App.getInfo();
-    } catch (e) {
-     //
-    }
-
-    const data = {
-      app: 'Authman',
-      email: user.email,
-      appId: appInfo?.name,
-      version: appInfo?.version,
-      build: appInfo?.build,
-      accounts: items
-    };
-    const json = JSON.stringify(data);
     const fileName = 'authman-export.json';
 
     if (Capacitor.isNativePlatform()) {
@@ -41,9 +24,9 @@ export default new class {
         data: json
       });
 
-      await FileOpener.open({
-        filePath: result.uri,
-        contentType: 'application/json',
+      await FileOpener.openFile({
+        path: result.uri,
+        mimeType: 'application/json',
       });
     } else {
       const blob = new Blob([json], { type: 'application/json' });
@@ -54,15 +37,30 @@ export default new class {
       a.download = fileName;
       a.click();
     }
+  }
 
-    // const canShare = await Share.canShare();
-    //
-    // if (!canShare.value) {
-    //   await simpleAlert('Unable to save file');
-    //   return;
-    // }
-    //
-    //
+  async readAccountsToJson() {
+    const accounts = (await accountService.getAccounts())!;
+
+    const items = await accountService.decryptAccounts(accounts);
+    const user = userStorage.value!;
+    let appInfo = undefined;
+
+    try {
+      appInfo = await App.getInfo();
+    } catch (e) {
+      //
+    }
+
+    const data = {
+      app: 'Authman',
+      userId: user.id,
+      email: user.email,
+      appId: appInfo?.name,
+      version: appInfo?.version,
+      build: appInfo?.build,
+      accounts: items
+    };
+    return JSON.stringify(data);
   }
 }
-

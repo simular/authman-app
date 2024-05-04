@@ -8,8 +8,6 @@ PODS:
     - CapacitorCordova
   - CapacitorApp (5.0.7):
     - Capacitor
-  - CapacitorCommunityFileOpener (6.0.0):
-    - Capacitor
   - CapacitorCordova (5.7.3)
   - CapacitorFilesystem (6.0.0):
     - Capacitor
@@ -23,6 +21,10 @@ PODS:
   - CapacitorShare (6.0.0):
     - Capacitor
   - CapacitorStatusBar (5.0.7):
+    - Capacitor
+  - CapawesomeCapacitorFilePicker (6.0.0):
+    - Capacitor
+  - CapawesomeTeamCapacitorFileOpener (6.0.0):
     - Capacitor
   - GoogleDataTransport (9.4.1):
     - GoogleUtilities/Environment (~> 7.7)
@@ -89,7 +91,6 @@ DEPENDENCIES:
   - "AparajitaCapacitorSecureStorage (from `../../node_modules/@aparajita/capacitor-secure-storage`)"
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
-  - "CapacitorCommunityFileOpener (from `../../node_modules/@capacitor-community/file-opener`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorFilesystem (from `../../node_modules/@capacitor/filesystem`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
@@ -97,6 +98,8 @@ DEPENDENCIES:
   - "CapacitorMlkitBarcodeScanning (from `../../node_modules/@capacitor-mlkit/barcode-scanning`)"
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapawesomeCapacitorFilePicker (from `../../node_modules/@capawesome/capacitor-file-picker`)"
+  - "CapawesomeTeamCapacitorFileOpener (from `../../node_modules/@capawesome-team/capacitor-file-opener`)"
 
 SPEC REPOS:
   trunk:
@@ -123,8 +126,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorApp:
     :path: "../../node_modules/@capacitor/app"
-  CapacitorCommunityFileOpener:
-    :path: "../../node_modules/@capacitor-community/file-opener"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorFilesystem:
@@ -139,13 +140,16 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/share"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapawesomeCapacitorFilePicker:
+    :path: "../../node_modules/@capawesome/capacitor-file-picker"
+  CapawesomeTeamCapacitorFileOpener:
+    :path: "../../node_modules/@capawesome-team/capacitor-file-opener"
 
 SPEC CHECKSUMS:
   AparajitaCapacitorBiometricAuth: 9e8780b6ad19eee077804cc2a00a0b49c4d2ad56
   AparajitaCapacitorSecureStorage: 2f3a28fa7cf90053bf5b56834607349cbf9f24ca
   Capacitor: 7b5eb47c6125e9b58a3e3cd02fe366fc58adc89c
   CapacitorApp: 17fecd0e6cb23feafac7eb0939417389038b0979
-  CapacitorCommunityFileOpener: 4e0086fac78b4ccaaf64956abe34d3443db5767a
   CapacitorCordova: a377c52a28dbb3b895c0f71187f7b1777fee69db
   CapacitorFilesystem: 60e59ba274c234a979e7a3be2552feaadcee4263
   CapacitorHaptics: 7c7c206f0c96a628fed073830c96d28c4b2e772e
@@ -153,6 +157,8 @@ SPEC CHECKSUMS:
   CapacitorMlkitBarcodeScanning: 8fb81cbef3c6ffe0c0e2dbd15ed6dca889a5a062
   CapacitorShare: a771200d3b924a5d7ad9d9fecbac517e4c0aa74f
   CapacitorStatusBar: f390fbb49b82ffb754ea4b3cf71dc8b048baf3e7
+  CapawesomeCapacitorFilePicker: 983e8d272d200897cf1c12cf9a62439fa2fb2c35
+  CapawesomeTeamCapacitorFileOpener: cc2c8a7dfa421742918fa6b146cbf4ecd1b81f2d
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleMLKit: 2bd0dc6253c4d4f227aad460f69215a504b2980e
   GoogleToolboxForMac: 8bef7c7c5cf7291c687cf5354f39f9db6399ad34
@@ -167,6 +173,6 @@ SPEC CHECKSUMS:
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
-PODFILE CHECKSUM: cb8fc344c9705a10590540bb51efc742c856fcdd
+PODFILE CHECKSUM: 3c8290f2c59309eec86d3119f96527b6dc781b48
 
 COCOAPODS: 1.12.1

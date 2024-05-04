@@ -2,6 +2,7 @@
 import icon from '@/assets/images/icon.svg';
 import MainLayout from '@/components/layout/MainLayout.vue';
 import exportService from '@/service/export-service';
+import importService from '@/service/import-service';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
@@ -10,12 +11,13 @@ import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';
 import {
-  faEnvelope, faFileExport,
+  faDownload,
+  faEnvelope, faFileExport, faFileImport,
   faFingerprint,
   faKey,
   faLock,
   faShareNodes,
-  faSignOut, faUserAlt,
+  faSignOut, faUpload, faUserAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonImg, IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
@@ -46,6 +48,10 @@ function lockScreen() {
     'forward',
     'push'
   );
+}
+
+async function importAccounts() {
+  await importService.import();
 }
 
 async function exportAccounts() {
@@ -123,9 +129,17 @@ async function logout() {
           </ion-label>
         </ion-item>
 
+        <!-- Import -->
+        <ion-item button @click="importAccounts">
+          <FontAwesomeIcon :icon="faUpload" slot="start" />
+          <ion-label>
+            Import
+          </ion-label>
+        </ion-item>
+
         <!-- Export -->
         <ion-item button @click="exportAccounts">
-          <FontAwesomeIcon :icon="faFileExport" slot="start" />
+          <FontAwesomeIcon :icon="faDownload" slot="start" />
           <ion-label>
             Export
           </ion-label>

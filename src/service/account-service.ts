@@ -26,6 +26,29 @@ export default new class {
     );
   }
 
+  async saveMultiple(accounts: Account[]) {
+    await userService.touch();
+
+    const master = await encryptionService.getMasterKey();
+
+    const items: Account<string>[] = [];
+
+    for (let account of accounts) {
+      account = cloneDeep(account);
+
+      const encryptedAccount = await this.encryptAccount(account, master);
+
+      items.push(encryptedAccount);
+    }
+
+    const res = await apiClient.post(
+      'account/saveMultiple',
+      {
+        items,
+      },
+    );
+  }
+
   async getAccounts() {
     const res = await apiClient.get<{
       data: {

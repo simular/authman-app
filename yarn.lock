@@ -1209,11 +1209,6 @@
     mime-types "~2.1.35"
     ora "^5.4.1"
 
-"@capacitor-community/file-opener@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@capacitor-community/file-opener/-/file-opener-6.0.0.tgz#de2ce2b12979598d433684bb606315fece0e235a"
-  integrity sha512-nJ9S5rCqnVDBKfqdjDhrYOIO9JLeScFkRfKLs2G+d6Df73vrJMes8dr+dGSEvKiPhyjRhICW5imDJEbzaD8KpA==
-
 "@capacitor-mlkit/barcode-scanning@^5.4.0":
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/@capacitor-mlkit/barcode-scanning/-/barcode-scanning-5.4.0.tgz#cb64b7f421e442d2114bf8b57bd440b2b874315e"
@@ -1328,6 +1323,16 @@
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/@capacitor/status-bar/-/status-bar-5.0.7.tgz#a341e8dec9f93769bed4a42e8ad397e5df1b5287"
   integrity sha512-KblB3gV2LDMEjx3fQoNBAzxb+Tr+2mv68SfFLLDCMiMUD3Eile2TAWRWd1yxy496pDFTOs2BJtup8++iuuuJ/w==
+
+"@capawesome-team/capacitor-file-opener@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capawesome-team/capacitor-file-opener/-/capacitor-file-opener-6.0.0.tgz#76010fb0fb96afdd0d1d4c1631eec38c93ffacce"
+  integrity sha512-5oTkPehP0tRrWWkdxvhIhxyjTFIJBPN5kfb291Y7tr0p+318ZMhzimLePf1enj/0/aKaDGzbyPNJxNmjGMB8gQ==
+
+"@capawesome/capacitor-file-picker@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capawesome/capacitor-file-picker/-/capacitor-file-picker-6.0.0.tgz#9ac21020770867cffa266ff01fd50da7983bd0bd"
+  integrity sha512-u5TiigO1zuM5H29F5YkWcLLD0prsV78TlgkBY86IoAZZe72g6cyICwGzaUPq8DlkvARoUwIrU0ItEz7c1ePOew==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
