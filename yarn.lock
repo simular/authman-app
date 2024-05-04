@@ -1209,6 +1209,11 @@
     mime-types "~2.1.35"
     ora "^5.4.1"
 
+"@capacitor-community/file-opener@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/file-opener/-/file-opener-6.0.0.tgz#de2ce2b12979598d433684bb606315fece0e235a"
+  integrity sha512-nJ9S5rCqnVDBKfqdjDhrYOIO9JLeScFkRfKLs2G+d6Df73vrJMes8dr+dGSEvKiPhyjRhICW5imDJEbzaD8KpA==
+
 "@capacitor-mlkit/barcode-scanning@^5.4.0":
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/@capacitor-mlkit/barcode-scanning/-/barcode-scanning-5.4.0.tgz#cb64b7f421e442d2114bf8b57bd440b2b874315e"
@@ -1288,6 +1293,11 @@
   integrity sha512-iZBgvx3o4amzKv5ttA+QHB6i7cxK+/mYpCQd1tnSdipg6ZkvfBhg1HkzhEqHk+I7MNur+QwgYDZho9+ycHRwOw==
   dependencies:
     tslib "^2.1.0"
+
+"@capacitor/filesystem@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/filesystem/-/filesystem-6.0.0.tgz#d02778ed920a25559c60b0940c058cc6732feb14"
+  integrity sha512-GnC4CBfky7fvG9zSV/aQnZaGs6ZJ90AaQorr53z81ArTCqcrSUeBMuCxWmvti9HrdXLhBavyA1UOjvRGObOFjg==
 
 "@capacitor/haptics@5.0.7":
   version "5.0.7"

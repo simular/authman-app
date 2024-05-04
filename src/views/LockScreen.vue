@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import logo from '@/assets/images/logo-dark.svg';
+import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import { isLock, kekStorage, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
@@ -62,9 +63,9 @@ const { loading, run } = useLoading();
 async function biometricsUnlock() {
   try {
     await run(async () => {
-      await lockScreenService.biometricsAuthenticate();
+      await localAuthService.biometricsAuthenticate();
 
-      const kek = (await SecureStorage.get('@authman:secure.kek')) as string;
+      const kek = await localAuthService.getKek();
 
       if (!kek) {
         throw new Error('You must re-enter your password.');

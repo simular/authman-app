@@ -26,7 +26,7 @@ export default new class {
     );
   }
 
-  async loadAccounts() {
+  async getAccounts() {
     const res = await apiClient.get<{
       data: {
         user: User;
@@ -49,7 +49,11 @@ export default new class {
       return;
     }
 
-    accountsStorage.value = items;
+    return items;
+  }
+
+  async loadAccounts() {
+    accountsStorage.value = (await this.getAccounts())!;
     mainStore.decryptedAccounts = await this.getDecryptedAccounts();
   }
 
@@ -82,9 +86,7 @@ export default new class {
     return res.data;
   }
 
-  async getDecryptedAccounts() {
-    const accounts = accountsStorage.value;
-
+  async decryptAccounts(accounts: Account<string>[]) {
     const items: Account[] = [];
     const master = await encryptionService.getMasterKey();
 
@@ -95,5 +97,11 @@ export default new class {
     }
 
     return items;
+  }
+
+  async getDecryptedAccounts() {
+    const accounts = accountsStorage.value;
+
+    return this.decryptAccounts(accounts);
   }
 };

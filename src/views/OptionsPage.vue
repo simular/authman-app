@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import icon from '@/assets/images/icon.svg';
 import MainLayout from '@/components/layout/MainLayout.vue';
+import exportService from '@/service/export-service';
+import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
 import { noInstantUnlock, userStorage } from '@/store/main-store';
@@ -24,11 +26,13 @@ const user = userStorage.value!;
 
 watch(enableBiometricsOption, async (v) => {
   if (v) {
-    const r = await lockScreenService.testBiometrics();
+    const r = await lockScreenService.testBiometricsAndStoreKek();
 
     if (!r) {
       enableBiometricsOption.value = false;
     }
+  } else {
+    await localAuthService.clearKek();
   }
 });
 
@@ -42,6 +46,10 @@ function lockScreen() {
     'forward',
     'push'
   );
+}
+
+async function exportAccounts() {
+  await exportService.export();
 }
 
 async function share() {
@@ -116,7 +124,7 @@ async function logout() {
         </ion-item>
 
         <!-- Export -->
-        <ion-item button>
+        <ion-item button @click="exportAccounts">
           <FontAwesomeIcon :icon="faFileExport" slot="start" />
           <ion-label>
             Export

@@ -1,15 +1,7 @@
-import encryptionService from '@/service/encryption-service';
+import localAuthService from '@/service/local-auth-service';
 import userService from '@/service/user-service';
-import { isLock, kekStorage, noInstantUnlock, saltStorage } from '@/store/main-store';
+import { isLock, kekStorage, noInstantUnlock } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
-import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import {
-  AndroidBiometryStrength,
-  BiometricAuth,
-  BiometryType,
-} from '@aparajita/capacitor-biometric-auth';
-import { KeychainAccess, SecureStorage } from '@aparajita/capacitor-secure-storage';
-import { Capacitor } from '@capacitor/core';
 import idleTimeout from 'idle-timeout';
 import IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
@@ -34,24 +26,8 @@ export default new class {
     idleInstance.resume();
   }
 
-  async validatePasswordAndGetKek(password: string) {
-    const kek = await encryptionService.deriveKek(
-      password,
-      secretToolkit.decode(saltStorage.value)
-    );
-
-    try {
-      await encryptionService.getSecretKey(kek);
-
-      return secretToolkit.encode(kek, Encoder.HEX);
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  }
-
   async passwordAuthenticate(password: string) {
-    const kek = await this.validatePasswordAndGetKek(password);
+    const kek = await localAuthService.validatePasswordAndGetKek(password);
 
     if (!kek) {
       throw new Error('Invalid password');
@@ -60,33 +36,27 @@ export default new class {
     return kek;
   }
 
-  async testBiometrics() {
+  async testBiometricsAndStoreKek() {
     try {
-      await this.biometricsAuthenticate();
+      await localAuthService.biometricsAuthenticate();
 
       const password = await userService.askPassword(
         'Your Password',
-        'Please enter master password again.'
+        'Please enter master password again.',
       );
 
       if (!password) {
         return false;
       }
 
-      const kek = await this.validatePasswordAndGetKek(password);
+      const kek = await localAuthService.validatePasswordAndGetKek(password);
 
       if (!kek) {
         simpleAlert('Invalid Password');
         return false;
       }
 
-      await SecureStorage.set(
-        '@authman:secure.kek',
-        kek,
-        undefined,
-        false,
-        KeychainAccess.whenPasscodeSetThisDeviceOnly,
-      );
+      await localAuthService.storeKek(kek);
 
       return true;
     } catch (e) {
@@ -96,32 +66,6 @@ export default new class {
 
       return false;
     }
-  }
-
-  async biometricsAuthenticate() {
-    if (!Capacitor.isNativePlatform()) {
-      // web simulate
-      await BiometricAuth.setBiometryType(BiometryType.touchId);
-      await BiometricAuth.setBiometryIsEnrolled(true);
-      await BiometricAuth.setDeviceIsSecure(true);
-    }
-
-    const info = await BiometricAuth.checkBiometry();
-
-    if (!info.isAvailable) {
-      throw new Error('Touch ID or Face ID not available.');
-    }
-
-    await BiometricAuth.authenticate({
-      reason: 'Please authenticate',
-      cancelTitle: 'Cancel',
-      allowDeviceCredential: true,
-      iosFallbackTitle: 'Use password',
-      androidTitle: 'Biometric login',
-      androidSubtitle: 'Log in using biometric authentication',
-      androidConfirmationRequired: true,
-      androidBiometryStrength: AndroidBiometryStrength.weak,
-    });
   }
 
   listenIdleTimeout() {
