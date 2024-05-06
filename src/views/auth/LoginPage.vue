@@ -3,10 +3,12 @@ import logo from '@/assets/images/logo-dark.svg';
 import authService from '@/service/auth-service';
 import { accessTokenStorage, isLogin, refreshTokenStorage, userStorage } from '@/store/main-store';
 import useLoading from '@/utilities/loading';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   IonButton,
   IonContent,
-  IonInput,
+  IonInput, IonItem, IonList,
   IonPage,
   IonSpinner,
   useBackButton,
@@ -60,25 +62,33 @@ async function authenticate() {
 
         <h3 style="margin-bottom: 1.5rem">Sign In</h3>
 
-        <div style="width: 100%; display: grid; gap: 1rem;">
-          <ion-input label="Email"
-            type="email"
-            fill="solid"
-            label-placement="floating"
-            placeholder="xxx@xxx.xx"
-            autocomplete="email"
-            v-model="email"
-          >
-          </ion-input>
+        <div style="width: 85%; display: grid; gap: 1rem;">
+          <ion-list style="display: grid; gap: 1rem">
+            <ion-item>
+              <ion-input label="Email"
+                type="email"
+                fill="solid"
+                label-placement="floating"
+                placeholder="xxx@xxx.xx"
+                autocomplete="email"
+                v-model="email"
+              >
+                <FontAwesomeIcon :icon="faEnvelope" slot="start" />
+              </ion-input>
+            </ion-item>
 
-          <ion-input label="Password"
-            type="password"
-            fill="solid"
-            label-placement="floating"
-            placeholder="**********"
-            v-model="password"
-          >
-          </ion-input>
+            <ion-item>
+              <ion-input label="Password"
+                type="password"
+                fill="solid"
+                label-placement="floating"
+                placeholder="**********"
+                v-model="password"
+              >
+                <FontAwesomeIcon :icon="faLock" slot="start" />
+              </ion-input>
+            </ion-item>
+          </ion-list>
 
           <ion-button expand="block" @click="authenticate"
             :disabled="loading">
@@ -116,5 +126,9 @@ ion-content {
   max-width: 550px;
   margin-left: auto;
   margin-right: auto;
+}
+
+ion-item {
+  --padding-start: 0;
 }
 </style>

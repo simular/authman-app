@@ -80,7 +80,7 @@ async function logout() {
       <ion-list style="" inset>
         <!-- About -->
         <ion-item button router-link="about">
-          <ion-img :src="icon" slot="start" style="height: 1.5rem" />
+          <ion-img :src="icon" slot="start" style="height: 1.5rem; width: 1.5rem;" />
           <ion-label>
             About Authman
           </ion-label>

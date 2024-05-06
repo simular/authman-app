@@ -1,10 +1,11 @@
 import accountService from '@/service/account-service';
 import { userStorage } from '@/store/main-store';
+import { simpleAlert } from '@/utilities/alert';
 import { useLoadingOverlay } from '@/utilities/loading';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import { FileOpener } from '@capawesome-team/capacitor-file-opener';
+import { Share } from '@capacitor/share';
 
 export default new class {
   async export() {
@@ -24,10 +25,21 @@ export default new class {
         data: json
       });
 
-      await FileOpener.openFile({
-        path: result.uri,
-        mimeType: 'application/json',
-      });
+      const canShare = await Share.canShare();
+
+      if (canShare.value) {
+        await Share.share({
+          title: 'Save file to...',
+          files: [result.uri],
+        });
+      } else {
+        simpleAlert('Unable to share...');
+      }
+
+      // await FileOpener.openFile({
+      //   path: result.uri,
+      //   mimeType: 'application/json',
+      // });
     } else {
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

@@ -1,16 +1,18 @@
 <script setup lang="ts">
 
-import logo from '@/assets/images/logo-sq-w.svg';
+import logo from '@/assets/images/icon.svg';
 import { default as vPasswordStrength } from '@/directive/password-strength';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
 import { srpClient } from '@/service/srp';
 import { User } from '@/types';
 import useLoading from '@/utilities/loading';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   IonButton,
   IonContent,
-  IonInput,
+  IonInput, IonItem, IonList,
   IonPage,
   IonSpinner,
   toastController,
@@ -73,25 +75,34 @@ async function register() {
           Create a new account
         </h3>
 
-        <div style="width: 100%; display: grid; gap: 1rem;">
-          <ion-input label="Email"
-            type="email"
-            fill="solid"
-            label-placement="stacked"
-            placeholder=""
-            autocomplete="email"
-            v-model="email"
-          >
-          </ion-input>
+        <div style="width: 85%; display: grid; gap: 1rem;">
+          <ion-list style="display: grid; gap: 1rem;">
+            <ion-item>
+              <ion-input label="Email"
+                type="email"
+                fill="solid"
+                label-placement="stacked"
+                placeholder=""
+                autocomplete="email"
+                v-model="email"
+              >
+                <FontAwesomeIcon :icon="faEnvelope" slot="start" />
+              </ion-input>
+            </ion-item>
 
-          <ion-input label="Password"
-            v-password-strength
-            type="password"
-            fill="solid"
-            label-placement="stacked"
-            placeholder=""
-            v-model="password"
-          />
+            <ion-item>
+              <ion-input label="Password"
+                v-password-strength
+                type="password"
+                fill="solid"
+                label-placement="stacked"
+                placeholder=""
+                v-model="password"
+              >
+                <FontAwesomeIcon :icon="faLock" slot="start" />
+              </ion-input>
+            </ion-item>
+          </ion-list>
 
           <ion-button expand="block" @click="register"
             :disabled="loading">
@@ -129,5 +140,9 @@ ion-content {
   max-width: 550px;
   margin-left: auto;
   margin-right: auto;
+}
+
+ion-item {
+  --padding-start: 0;
 }
 </style>

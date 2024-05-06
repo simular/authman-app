@@ -1,6 +1,6 @@
 body.scanner-active {
-  --background: transparent;
-  --ion-background-color: transparent;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
 
   #app {
     opacity: 0 !important;
