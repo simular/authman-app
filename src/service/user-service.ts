@@ -1,6 +1,7 @@
 import router from '@/router';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
+import localAuthService from '@/service/local-auth-service';
 import {
   accessTokenStorage,
   accountsLoaded,
@@ -13,6 +14,7 @@ import {
   saltStorage,
   userStorage,
 } from '@/store/main-store';
+import { enableBiometricsOption } from '@/store/options-store';
 import { User } from '@/types';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
@@ -31,9 +33,21 @@ export default new class UserService {
     mainStore.user = undefined;
     mainStore.decryptedAccounts = [];
 
+    // Options
+    await this.clearUserOptions();
+
+    // Secrets
     await this.clearUserSecrets();
 
     router.replace({ name: 'login' });
+  }
+
+  async prepareLogin() {
+    // Options
+    await this.clearUserOptions();
+
+    // Secrets
+    await this.clearUserSecrets();
   }
 
   async storeUserSecrets(
@@ -64,6 +78,12 @@ export default new class UserService {
     kekStorage.value = '';
     saltStorage.value = '';
     userStorage.value = undefined;
+
+    await localAuthService.clearKek();
+  }
+
+  async clearUserOptions() {
+    enableBiometricsOption.value = false;
   }
 
   async touch() {

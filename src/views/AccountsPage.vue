@@ -63,7 +63,8 @@
               <div class="c-account-card__icon ion-text-center ion-padding">
                 <img :src="item.content.image" alt="img">
               </div>
-              <div class="c-account-card__title line-clamp">
+              <div class="c-account-card__title line-clamp"
+                style="text-align: center">
                 <h4>{{ item.content.title }}</h4>
               </div>
             </ion-card-content>
@@ -129,7 +130,7 @@ import {
   RefresherCustomEvent,
 } from '@ionic/vue';
 import { refDebounced } from '@vueuse/core';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // Search
 const q = ref('');
@@ -173,7 +174,29 @@ async function handleRefresh(e: RefresherCustomEvent) {
 }
 
 // Open account
+onMounted(() => {
+  document.addEventListener('open.account', openAccountByEvent);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('open.account', openAccountByEvent);
+});
+
 const accountModalOpen = computed(() => active.value != undefined);
+
+function openAccountByEvent(e: Event) {
+  if (e instanceof CustomEvent) {
+    openAccountById(e.detail.id);
+  }
+}
+
+function openAccountById(id: string) {
+  const account = mainStore.decryptedAccounts.find((account) => account.id === id);
+
+  if (account) {
+    selectAccount(account);
+  }
+}
 
 function selectAccount(account: Account) {
   if (selectMode.value) {

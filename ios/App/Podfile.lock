@@ -8,6 +8,8 @@ PODS:
     - CapacitorCordova
   - CapacitorApp (5.0.7):
     - Capacitor
+  - CapacitorClipboard (6.0.0):
+    - Capacitor
   - CapacitorCordova (5.7.3)
   - CapacitorFilesystem (6.0.0):
     - Capacitor
@@ -91,6 +93,7 @@ DEPENDENCIES:
   - "AparajitaCapacitorSecureStorage (from `../../node_modules/@aparajita/capacitor-secure-storage`)"
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
+  - "CapacitorClipboard (from `../../node_modules/@capacitor/clipboard`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorFilesystem (from `../../node_modules/@capacitor/filesystem`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
@@ -126,6 +129,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorApp:
     :path: "../../node_modules/@capacitor/app"
+  CapacitorClipboard:
+    :path: "../../node_modules/@capacitor/clipboard"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorFilesystem:
@@ -150,6 +155,7 @@ SPEC CHECKSUMS:
   AparajitaCapacitorSecureStorage: 2f3a28fa7cf90053bf5b56834607349cbf9f24ca
   Capacitor: 7b5eb47c6125e9b58a3e3cd02fe366fc58adc89c
   CapacitorApp: 17fecd0e6cb23feafac7eb0939417389038b0979
+  CapacitorClipboard: 80282f684154124b9019ebf401235b70b0cf4994
   CapacitorCordova: a377c52a28dbb3b895c0f71187f7b1777fee69db
   CapacitorFilesystem: 60e59ba274c234a979e7a3be2552feaadcee4263
   CapacitorHaptics: 7c7c206f0c96a628fed073830c96d28c4b2e772e
@@ -173,6 +179,6 @@ SPEC CHECKSUMS:
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
-PODFILE CHECKSUM: 3c8290f2c59309eec86d3119f96527b6dc781b48
+PODFILE CHECKSUM: 1ece9223dc3983bd250c574609e149aeda8b19f2
 
 COCOAPODS: 1.12.1

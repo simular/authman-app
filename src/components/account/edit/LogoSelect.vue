@@ -2,6 +2,8 @@
 import apiClient from '@/service/api-client';
 import { simpleAlert, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
+import { Clipboard } from '@capacitor/clipboard';
+import { Capacitor } from '@capacitor/core';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -71,28 +73,54 @@ watch(currentColor, () => {
 
 // Paste
 async function pasteImage() {
+  let imgDataUri: string | null = null;
+
+  if (Capacitor.isNativePlatform()) {
+    imgDataUri = await readImageFromDevice();
+  } else {
+    imgDataUri = await readImageFromBrowser();
+  }
+
+  if (!imgDataUri) {
+    return;
+  }
+
+  logo.value = await resizeImage(imgDataUri);
+
+  imageSource.value = ImageSource.PASTE;
+}
+
+async function readImageFromDevice() {
+  const { type, value } = await Clipboard.read();
+
+  if (!checkFileType([type])) {
+    return null;
+  }
+
+  return value;
+}
+
+async function readImageFromBrowser(): Promise<string | null> {
   const items = await navigator.clipboard.read();
 
   let types = items[0].types;
 
   if (types.length === 0) {
     simpleAlert('Unable to get clipboard data.');
-    return;
+    return null;
   }
 
   types = types.slice().sort();
 
   if (!checkFileType(types)) {
-    return;
+    return null;
   }
 
   const type = types[0];
   const blob = await items[0].getType(type);
   const file = new File([blob], 'image.png', { type });
 
-  logo.value = await resizeImage(await readFileAsBase64(file));
-
-  imageSource.value = ImageSource.PASTE;
+  return await readFileAsBase64(file);
 }
 
 // Upload

@@ -1275,6 +1275,11 @@
     tslib "^2.4.0"
     xml2js "^0.5.0"
 
+"@capacitor/clipboard@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/clipboard/-/clipboard-6.0.0.tgz#783d6759dda471eef7e30d6a49c7a80bf81ad053"
+  integrity sha512-NjcGr2jncSZy9NM9grePo8zz0hhBYYBYZV71xXjLvJhVY4PSdZD/Sj+4jm0pvlOKSK8vAXYyF6VcWT4/Kh/xmw==
+
 "@capacitor/core@5.7.3":
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-5.7.3.tgz#79f7833fba5d36a4e9dfebbc78c9efa1406071e8"

@@ -116,7 +116,7 @@ async function passwordUnlock() {
           <img :src="logo" alt="logo" style="width: 175px; aspect-ratio: 1">
         </div>
 
-        <h3 style="margin-bottom: .5rem">Enter Password to Unlock</h3>
+        <h3 style="margin-bottom: .5rem">Unlock</h3>
 
         <p>
           {{ email }}
@@ -128,6 +128,7 @@ async function passwordUnlock() {
               ref="passwordInput"
               type="password"
               fill="solid"
+              label="Password"
               label-placement="floating"
               placeholder="Password"
               v-model="password"

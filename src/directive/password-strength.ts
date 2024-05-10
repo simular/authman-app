@@ -12,6 +12,10 @@ export default <Directive<HTMLIonInputElement>> {
 }
 
 function onInput(e: Event) {
+  if (import.meta.env.VITE_CHECK_PASSWORD_STRENGTH !== '1') {
+    return;
+  }
+
   const el = e.currentTarget as HTMLIonInputElement;
   const result = zxcvbn(el.value as string);
 

@@ -43,7 +43,13 @@ async function save() {
 
     mainStore.decryptedAccounts.unshift(account);
 
-    modalController.dismiss();
+    await modalController.dismiss();
+
+    setTimeout(() => {
+      document.dispatchEvent(
+        new CustomEvent('open.account', { detail: { id: account.id } })
+      );
+    }, 300);
   });
 }
 </script>

@@ -1,5 +1,5 @@
 {
-  "appId": "com.uniauth.authman",
+  "appId": "io.authman",
   "directories": {
     "buildResources": "resources"
   },

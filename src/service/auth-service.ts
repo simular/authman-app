@@ -43,6 +43,8 @@ export default new class AuthService {
         : undefined,
     );
 
+    await userService.prepareLogin();
+
     kekStorage.value = secretToolkit.encode(
       data.kek,
       Encoder.HEX,
