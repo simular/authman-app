@@ -91,7 +91,7 @@ async function authenticate() {
           </ion-list>
 
           <ion-button expand="block" @click="authenticate"
-            :disabled="loading">
+            :disabled="loading || !email || !password">
             <template v-if="!loading">
               Login
             </template>
