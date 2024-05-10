@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import logoDark from '@/assets/images/logo-h-dark.svg';
 import HeaderCondense from '@/components/layout/HeaderCondense.vue';
+import { isMobile } from '@/store/main-store';
 import {
-  getPlatforms,
   IonBackButton,
   IonButtons,
   IonContent,
@@ -27,8 +27,6 @@ const props = withDefaults(
     showMenuButton: false,
   },
 );
-
-const isMobile = getPlatforms().includes('mobile');
 
 </script>
 

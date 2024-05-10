@@ -13,8 +13,9 @@
   "license": "MIT",
   "main": "build/src/index.js",
   "scripts": {
-    "build": "electron-rebuild",
+    "build": "tsc || true && electron-rebuild",
     "dev": "node ./live-runner.js",
+    "electron:start-live": "node ./live-runner.js",
     "electron:start": "yarn build && electron --inspect=5858 ./",
     "electron:pack": "yarn build && electron-builder build --dir -c ./electron-builder.config.json",
     "electron:make": "yarn build && electron-builder build -c ./electron-builder.config.json -p always"
@@ -22,6 +23,7 @@
   "dependencies": {
     "@capacitor-community/electron": "^5.0.0",
     "chokidar": "~3.5.3",
+    "dotenv-flow": "^4.1.0",
     "electron-is-dev": "~2.0.0",
     "electron-serve": "~1.1.0",
     "electron-unhandled": "~4.0.1",

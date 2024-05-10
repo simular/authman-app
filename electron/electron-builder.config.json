@@ -10,7 +10,8 @@
     "app/**/*"
   ],
   "publish": {
-    "provider": "github"
+    "provider": "github",
+    "publishAutoUpdate": false
   },
   "nsis": {
     "allowElevation": true,
@@ -23,6 +24,7 @@
   },
   "mac": {
     "category": "your.app.category.type",
-    "target": "dmg"
+    "target": "dmg",
+    "icon": "assets/appIcon.png"
   }
 }

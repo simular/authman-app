@@ -10,7 +10,14 @@ import { app, BrowserWindow, Menu, MenuItem, nativeImage, Tray, session } from '
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { URL } from 'url';
+
+import dotenvFlow from 'dotenv-flow';
+dotenvFlow.config({
+  default_node_env: 'development',
+  path: resolve('..')
+});
 
 // Define components for a watcher to detect when the webapp is changed so we can reload in Dev mode.
 const reloadWatcher = {
@@ -220,14 +227,16 @@ export class ElectronCapacitorApp {
 // Set a CSP up for our application based on the custom scheme
 export function setupContentSecurityPolicy(customScheme: string): void {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const host = 'https://authman.io http://localhost';
+
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        // 'Content-Security-Policy': [
-        //   electronIsDev
-        //     ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:`
-        //     : `default-src ${customScheme}://* 'unsafe-inline' data:`,
-        // ],
+        'Content-Security-Policy': [
+          electronIsDev
+            ? `default-src ${customScheme}://* ${host} 'unsafe-inline' devtools://* 'unsafe-eval' data:`
+            : `default-src ${customScheme}://* ${host} 'unsafe-inline' 'wasm-unsafe-eval' data:`,
+        ],
       },
     });
   });

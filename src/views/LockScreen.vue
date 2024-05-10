@@ -3,9 +3,10 @@
 import logo from '@/assets/images/logo-dark.svg';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
+import userService from '@/service/user-service';
 import { isLock, kekStorage, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
-import { simpleToast } from '@/utilities/alert';
+import { simpleConfirm, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { headShake } from '@asika32764/vue-animate';
@@ -106,6 +107,17 @@ async function passwordUnlock() {
   }
 }
 
+async function logout() {
+  const v = await simpleConfirm('Do you want to logout?');
+
+  if (v) {
+    isLock.value = false;
+    noInstantUnlock.value = false;
+
+    await userService.logoutAndRedirect();
+  }
+}
+
 </script>
 
 <template>
@@ -160,6 +172,15 @@ async function passwordUnlock() {
               </template>
             </ion-button>
           </template>
+
+          <div style="margin-top: 100px">
+            <ion-button expand="block" @click="logout"
+              fill="clear"
+              color="danger"
+              :disabled="loading">
+              Logout
+            </ion-button>
+          </div>
         </div>
       </div>
     </ion-content>

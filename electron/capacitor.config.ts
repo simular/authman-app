@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.uniauth.authman',
+  appId: 'io.authman',
   appName: 'Authman',
   webDir: 'dist',
   server: {

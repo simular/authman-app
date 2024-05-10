@@ -6,7 +6,7 @@ import importService from '@/service/import-service';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
-import { noInstantUnlock, userStorage } from '@/store/main-store';
+import { isElectron, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';

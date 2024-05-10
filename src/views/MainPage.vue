@@ -1,11 +1,11 @@
 <template>
   <ion-page>
     <ion-split-pane content-id="main-body">
-      <SideMenu />
+      <SideMenu v-if="isDesktop" />
       <ion-page id="main-body">
         <ion-tabs>
           <ion-router-outlet></ion-router-outlet>
-          <ion-tab-bar slot="bottom">
+          <ion-tab-bar v-if="isMobile" slot="bottom">
             <ion-tab-button tab="tab1" href="/pages/accounts">
               <ion-icon aria-hidden="true" :icon="people" />
               <ion-label>Accounts</ion-label>
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import SideMenu from '@/components/SideMenu.vue';
+import { isDesktop, isMobile } from '@/store/main-store';
 import {
   IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet,
   IonSplitPane,
