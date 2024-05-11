@@ -16,6 +16,7 @@ import {
 } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { User } from '@/types';
+import { useLoadingOverlay } from '@/utilities/loading';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { headShake } from '@asika32764/vue-animate';
@@ -24,20 +25,24 @@ import { AxiosError } from 'axios';
 
 export default new class UserService {
   async logoutAndRedirect() {
-    accessTokenStorage.value = '';
-    refreshTokenStorage.value = '';
+    const { run } = await useLoadingOverlay('Logout...');
 
-    accountsStorage.value = [];
-    accountsLoaded.value = false;
+    await run(async () => {
+      accessTokenStorage.value = '';
+      refreshTokenStorage.value = '';
 
-    mainStore.user = undefined;
-    mainStore.decryptedAccounts = [];
+      accountsStorage.value = [];
+      accountsLoaded.value = false;
 
-    // Options
-    await this.clearUserOptions();
+      mainStore.user = undefined;
+      mainStore.decryptedAccounts = [];
 
-    // Secrets
-    await this.clearUserSecrets();
+      // Options
+      await this.clearUserOptions();
+
+      // Secrets
+      await this.clearUserSecrets();
+    });
 
     router.replace({ name: 'login' });
   }

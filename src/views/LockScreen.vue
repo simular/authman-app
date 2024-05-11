@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import logo from '@/assets/images/logo-dark.svg';
+import { default as vDisableSwipeBack } from '@/directive/disable-swipe-back';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
@@ -47,6 +48,8 @@ onIonViewWillEnter(async () => {
 
   if (!noInstantUnlock.value && unlockMode.value === 'biometrics') {
     await biometricsUnlock();
+  } else {
+    focusPasswordInput();
   }
 });
 
@@ -85,7 +88,7 @@ async function biometricsUnlock() {
 
     unlockMode.value = 'password';
 
-    passwordInput.value!.$el.setFocus(true);
+    focusPasswordInput();
   }
 }
 
@@ -118,10 +121,16 @@ async function logout() {
   }
 }
 
+function focusPasswordInput(delay = 100) {
+  setTimeout(() => {
+    passwordInput.value!.$el.setFocus(true);
+  }, delay);
+}
+
 </script>
 
 <template>
-  <ion-page>
+  <ion-page v-disable-swipe-back>
     <ion-content fullscreen class="ion-padding">
       <div class="main-content">
         <div style="text-align: center; margin-bottom: 1rem">

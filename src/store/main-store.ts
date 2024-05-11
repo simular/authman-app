@@ -39,10 +39,10 @@ export const isLock = ref(true);
 export const noInstantUnlock = ref(false);
 
 // Platform
-export const currentPlatform = ref(Capacitor.getPlatform());
-export const currentPlatforms = ref(getPlatforms());
+export const currentPlatform = computed<string>(() => Capacitor.getPlatform());
+export const currentPlatforms = ref<ReturnType<typeof getPlatforms>>([]);
 export const isElectron = computed(() => currentPlatform.value === 'electron');
 export const isWeb = computed(() => currentPlatform.value === 'web');
 export const isMobile = computed(() => currentPlatforms.value.includes('mobile'));
 export const isDesktop = computed(() => currentPlatforms.value.includes('desktop'));
-export const isNative = ref(Capacitor.isNativePlatform());
+export const isNative = computed(() => Capacitor.isNativePlatform());

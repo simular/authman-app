@@ -1,5 +1,11 @@
-import { isLogin } from '@/store/main-store';
+import {
+  currentPlatform,
+  currentPlatforms,
+  isLogin,
+  isNative,
+} from '@/store/main-store';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { Capacitor } from '@capacitor/core';
 import sodium from 'libsodium-wrappers-sumo';
 import { createApp, nextTick } from 'vue';
 import App from './App.vue'
@@ -8,7 +14,7 @@ import lockScreenService from '@/service/lock-screen-service';
 
 import('@asika32764/vue-animate/dist/vue-animate.css');
 
-import { IonicVue } from '@ionic/vue';
+import { getPlatforms, IonicVue } from '@ionic/vue';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -28,6 +34,8 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/main.scss';
+
+currentPlatforms.value = getPlatforms();
 
 const app = createApp(App)
   .use(IonicVue)
