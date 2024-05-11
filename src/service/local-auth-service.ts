@@ -11,13 +11,6 @@ import {
 } from '@aparajita/capacitor-biometric-auth';
 import { KeychainAccess, SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Capacitor } from '@capacitor/core';
-import type { ElectronApi } from '../../electron/src/preload';
-
-declare global {
-  interface Window {
-    api: typeof ElectronApi
-  }
-}
 
 /**
  * Class to handle local password & biometrics authentication.
@@ -89,7 +82,7 @@ export default new class {
 
   async isBiometricsAvailable() {
     if (isElectron.value) {
-      return window.api.canPromptTouchID();
+      return window.electronApi.canPromptTouchID();
     }
 
     const info = await this.getBiometricsInfo();
@@ -99,7 +92,7 @@ export default new class {
 
   async biometricsAuthenticate(options: AuthenticateOptions = {}) {
     if (isElectron.value) {
-      return window.api.promptTouchID('Please authenticate');
+      return window.electronApi.promptTouchID('Please authenticate');
     }
 
     if (!Capacitor.isNativePlatform()) {

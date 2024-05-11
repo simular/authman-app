@@ -15,5 +15,5 @@ export const ElectronApi = {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('isElectron', true);
 
-contextBridge.exposeInMainWorld('api', ElectronApi);
+contextBridge.exposeInMainWorld('electronApi', ElectronApi);
 
