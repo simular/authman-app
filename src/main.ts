@@ -1,6 +1,7 @@
+import electronService from '@/service/electron-service';
 import {
   currentPlatform,
-  currentPlatforms,
+  currentPlatforms, isElectron,
   isLogin,
   isNative,
 } from '@/store/main-store';
@@ -37,8 +38,16 @@ import './theme/main.scss';
 
 currentPlatforms.value = getPlatforms();
 
+console.log(
+  isElectron.value,
+  electronService.getMode(),
+  isElectron.value ? electronService.getMode() : undefined
+);
+
 const app = createApp(App)
-  .use(IonicVue)
+  .use(IonicVue, {
+    mode: isElectron.value ? electronService.getMode() : undefined
+  })
   .use(router);
   
 router.isReady().then(async () => {

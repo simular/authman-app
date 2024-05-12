@@ -9,7 +9,6 @@ import { isLock, kekStorage, noInstantUnlock, userStorage } from '@/store/main-s
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleConfirm, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
-import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { headShake } from '@asika32764/vue-animate';
 import {
   IonButton,
@@ -143,7 +142,7 @@ function focusPasswordInput(delay = 100) {
           {{ email }}
         </p>
 
-        <div style="width: 100%; display: grid; gap: 1rem;">
+        <div style="width: 85%; display: grid; gap: 1rem;">
           <template v-if="unlockMode === 'password'">
             <ion-input
               ref="passwordInput"
@@ -171,16 +170,17 @@ function focusPasswordInput(delay = 100) {
             </ion-button>
           </template>
           <template v-else>
-            <ion-button expand="block" @click="biometricsUnlock"
-              fill="clear"
-              :disabled="loading">
-              <template v-if="!loading">
-                Unlock
-              </template>
-              <template v-else>
-                <ion-spinner name="dots" />
-              </template>
-            </ion-button>
+            <div style="margin-top: 1.5rem">
+              <ion-button expand="block" @click="biometricsUnlock"
+                :disabled="loading">
+                <template v-if="!loading">
+                  Unlock
+                </template>
+                <template v-else>
+                  <ion-spinner name="dots" />
+                </template>
+              </ion-button>
+            </div>
           </template>
 
           <div style="margin-top: 100px">
