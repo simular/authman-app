@@ -48,7 +48,15 @@ export default new class EncryptionService {
   async getMasterKey(kek?: Uint8Array | string) {
     await sodium.ready;
 
-    kek = kek || secretToolkit.decode(kekStorage.value);
+    try {
+      kek = kek || secretToolkit.decode(kekStorage.value);
+    } catch (e) {
+      console.warn(
+        'Invalid KEK, debug info:',
+        kekStorage.value
+      );
+      throw new Error('Invalid KEK', { cause: e });
+    }
 
     const secret = await sodiumCipher.decrypt(base64UrlDecode(encSecretStorage.value), kek);
 

@@ -316,8 +316,9 @@ async function deleteAccounts(accounts: Account[]) {
   }
 
   &__icon img {
-    width: 56px;
-    aspect-ratio: 1;
+    width: 120px;
+    height: 56px;
+    object-fit: contain;
   }
 }
 </style>

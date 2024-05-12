@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import apiClient from '@/service/api-client';
+import { isElectron } from '@/store/main-store';
 import { simpleAlert, simpleToast } from '@/utilities/alert';
 import useLoading from '@/utilities/loading';
 import { Clipboard } from '@capacitor/clipboard';
@@ -75,7 +76,7 @@ watch(currentColor, () => {
 async function pasteImage() {
   let imgDataUri: string | null = null;
 
-  if (Capacitor.isNativePlatform()) {
+  if (Capacitor.isNativePlatform() && !isElectron.value) {
     imgDataUri = await readImageFromDevice();
   } else {
     imgDataUri = await readImageFromBrowser();
@@ -181,18 +182,24 @@ async function resizeImage(imgDataUri: string) {
     const img = document.createElement('img');
     img.addEventListener('load', (evt) => {
       const canvas = document.createElement("canvas");
-      canvas.width = 96;
-      canvas.height = 96;
-
-      const ctx = canvas.getContext("2d")!;
-
-      const maxWidth = canvas.width;
-      const maxHeight = canvas.height;
 
       let width = img.width;
       let height = img.height;
       let x = 0;
       let y = 0;
+
+      if (width > height) {
+        canvas.width = 120;
+        canvas.height = 120 / width * height;
+      } else {
+        canvas.width = 96;
+        canvas.height = 96;
+      }
+
+      const ctx = canvas.getContext("2d")!;
+
+      const maxWidth = canvas.width;
+      const maxHeight = canvas.height;
 
       // Resize
       if (width > height) {

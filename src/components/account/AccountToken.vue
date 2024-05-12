@@ -86,7 +86,7 @@ function round(num: number) {
 <template>
 <div>
   <div class="c-account-item" style="text-align: center" >
-    <img class="c-account-item__icon" :src="item.content.image" alt="icon" style="height: 64px">
+    <img class="c-account-item__icon" :src="item.content.image" alt="icon" style="">
 
     <h2 class="c-account-item__title">{{ item.content.title }}</h2>
 
@@ -126,6 +126,11 @@ function round(num: number) {
 
 <style scoped lang="scss">
 .c-account-item {
+  &__icon {
+    max-width: 120px;
+    height: 64px;
+    object-fit: contain;
+  }
 
   &__title {
     font-size: 1.25rem;
