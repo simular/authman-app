@@ -11,12 +11,12 @@
   ],
   "publish": {
     "provider": "github",
-    "publishAutoUpdate": false
+    "publishAutoUpdate": true
   },
   "nsis": {
     "allowElevation": true,
     "oneClick": false,
-    "allowToChangeInstallationDirectory": true
+    "allowToChangeInstallationDirectory": false
   },
   "win": {
     "target": "nsis",

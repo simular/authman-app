@@ -60,7 +60,7 @@ export class ElectronCapacitorApp {
   ];
   private AppMenuBarMenuTemplate: (MenuItem | MenuItemConstructorOptions)[] = [
     { role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu' },
-    { role: 'viewMenu' },
+    // { role: 'viewMenu' },
   ];
   private mainWindowState;
   private loadWebApp;
@@ -172,6 +172,10 @@ export class ElectronCapacitorApp {
 
     // Setup the main manu bar at the top of our window.
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.AppMenuBarMenuTemplate));
+
+    if (process.platform === 'win32') {
+      this.MainWindow.removeMenu();
+    }
 
     // If the splashscreen is enabled, show it first while the main window loads then switch it out for the main window, or just load the main window from the start.
     if (this.CapacitorFileConfig.electron?.splashScreenEnabled) {

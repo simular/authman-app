@@ -1,5 +1,5 @@
 import accountService from '@/service/account-service';
-import { userStorage } from '@/store/main-store';
+import { isElectron, userStorage } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
 import { useLoadingOverlay } from '@/utilities/loading';
 import { App } from '@capacitor/app';
@@ -17,12 +17,20 @@ export default new class {
 
     const fileName = 'authman-export.json';
 
-    if (Capacitor.isNativePlatform()) {
+    if (!Capacitor.isNativePlatform() || isElectron.value) {
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+    } else {
       const result = await Filesystem.writeFile({
         path: fileName,
         directory: Directory.Data,
         encoding: Encoding.UTF8,
-        data: json
+        data: json,
       });
 
       const canShare = await Share.canShare();
@@ -40,14 +48,6 @@ export default new class {
       //   path: result.uri,
       //   mimeType: 'application/json',
       // });
-    } else {
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
     }
   }
 

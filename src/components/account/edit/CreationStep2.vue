@@ -28,7 +28,7 @@ async function save() {
     userId: user.id,
     content: {
       title: props.title,
-      secret: props.secret,
+      secret: props.secret.replace(/\s+/, ''),
       url: props.host,
       image: logo.value,
     },

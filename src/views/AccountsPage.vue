@@ -138,6 +138,10 @@ const qDebounced = refDebounced(q, 500);
 const items = computed(() => {
   let accounts = mainStore.decryptedAccounts;
 
+  accounts = accounts.sort((a, b) => {
+    return a.content.title.localeCompare(b.content.title);
+  });
+
   if (qDebounced.value === '') {
     return accounts;
   }

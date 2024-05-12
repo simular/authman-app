@@ -37,9 +37,6 @@ onMounted(async () => {
 async function scanQRCode() {
   await stopScan();
 
-  // decodeTheUri('otpauth://discord.com/URHOUSE%20%E5%AE%B6%E5%90%88%E4%B8%8D%E5%8B%95%E7%94%A2?secret=KADMZDJH7Y');
-  // return;
-
   if (!await requestPermission()) {
     await permissionAlert();
     BarcodeScanner.openSettings();
@@ -155,7 +152,7 @@ async function next() {
       <div style="width: 75%">
         <ion-list>
           <ion-item>
-            <ion-input label="Or entering secret"
+            <ion-input label="Secret"
               type="text"
               fill="solid"
               label-placement="stacked"
