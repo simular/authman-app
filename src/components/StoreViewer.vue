@@ -1,19 +1,30 @@
 <script setup lang="ts">
 import {
   accessTokenStorage,
-  accountsStorage,
+  accountsStorage, currentPlatform, currentPlatforms,
   encMasterStorage,
   encSecretStorage,
   isLogin,
-  kekStorage, mainStore,
-  refreshTokenStorage, saltStorage,
+  kekStorage,
+  mainStore,
+  refreshTokenStorage,
+  saltStorage,
   userStorage,
 } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-const options = reactive({
-  enableBiometricsOption,
+const options = computed(() => {
+  return {
+    enableBiometricsOption: enableBiometricsOption.value
+  };
+});
+
+const platforms = computed(() => {
+  return {
+    currentPlatform: currentPlatform.value,
+    currentPlatforms: currentPlatforms.value,
+  };
 });
 
 function store(...args: any[]) {
@@ -34,6 +45,7 @@ function store(...args: any[]) {
     mainStore,
     refreshTokenStorage,
     userStorage,
+    platforms,
     options,
   )"></div>
 </template>

@@ -1,4 +1,4 @@
-import { alertController, toastController, ToastOptions } from '@ionic/vue';
+import { actionSheetController, alertController, toastController, ToastOptions } from '@ionic/vue';
 
 export async function simpleAlert(title: any, text?: string, type = 'warning'): Promise<void> {
   if (title instanceof Error || title.message) {
@@ -45,6 +45,34 @@ export async function simpleConfirm(title: string, text?: string): Promise<boole
             text: '確定',
             handler: () => {
               resolve(true);
+            },
+          },
+        ],
+      });
+
+    alert.then((alert) => alert.present());
+  });
+}
+
+export async function simpleActionSheetConfirm(title: string, buttons: string[] = []): Promise<boolean> {
+  return new Promise((resolve) => {
+    const alert = actionSheetController
+      .create({
+        // cssClass: 'my-custom-class',
+        header: title,
+        buttons: [
+          {
+            text: buttons[0] || '確定',
+            role: 'destructive',
+            handler: () => {
+              resolve(true);
+            },
+          },
+          {
+            text: buttons[1] || '取消',
+            role: 'cancel',
+            handler: () => {
+              resolve(false);
             },
           },
         ],

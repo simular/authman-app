@@ -1,0 +1,16 @@
+
+.alert-wrapper {
+  &.sc-ion-alert-md {
+    --background: var(--ion-color-step-150);
+  }
+
+  &.sc-ion-alert-ios {
+    --background: color-mix(in srgb, var(--ion-color-step-150) 70%, transparent);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, .25) !important;
+  }
+}
+
+.action-sheet-wrapper {
+  --background: var(--ion-color-step-150);
+}

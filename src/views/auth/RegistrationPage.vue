@@ -98,6 +98,7 @@ async function register() {
                 label-placement="stacked"
                 placeholder=""
                 v-model="password"
+                @keyup.enter="register"
               >
                 <FontAwesomeIcon :icon="faLock" slot="start" />
               </ion-input>

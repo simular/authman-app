@@ -153,6 +153,7 @@ function focusPasswordInput(delay = 100) {
               label-placement="floating"
               placeholder="Password"
               v-model="password"
+              @keyup.enter="passwordUnlock"
               error-text="Invalid Password"
               style="width: 85%; margin-left: auto; margin-right: auto"
             >

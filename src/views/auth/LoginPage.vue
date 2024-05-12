@@ -84,6 +84,7 @@ async function authenticate() {
                 label-placement="floating"
                 placeholder="**********"
                 v-model="password"
+                @keyup.enter="authenticate"
               >
                 <FontAwesomeIcon :icon="faLock" slot="start" />
               </ion-input>

@@ -8,7 +8,7 @@ import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
 import { isElectron, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
-import { simpleConfirm } from '@/utilities/alert';
+import { simpleActionSheetConfirm, simpleConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';
 import {
   faDownload,
@@ -66,7 +66,10 @@ async function share() {
 }
 
 async function logout() {
-  const v = await simpleConfirm('Do you want to logout?');
+  const v = await simpleActionSheetConfirm(
+    'Do you want to logout?',
+    ['Logout', 'Cancel']
+  );
 
   if (v) {
     userService.logoutAndRedirect();
