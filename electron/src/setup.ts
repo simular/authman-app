@@ -1,22 +1,22 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import {
-  CapElectronEventEmitter,
   CapacitorSplashScreen,
+  CapElectronEventEmitter,
   setupCapacitorElectronPlugins,
 } from '@capacitor-community/electron';
 import chokidar from 'chokidar';
+
+import dotenvFlow from 'dotenv-flow';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, BrowserWindow, Menu, MenuItem, nativeImage, Tray, session } from 'electron';
+import { app, BrowserWindow, Menu, MenuItem, nativeImage, session, Tray } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join, resolve } from 'path';
-import { URL } from 'url';
 
-import dotenvFlow from 'dotenv-flow';
 dotenvFlow.config({
   default_node_env: 'development',
-  path: resolve('..')
+  path: resolve('..'),
 });
 
 // Define components for a watcher to detect when the webapp is changed so we can reload in Dev mode.
@@ -25,6 +25,7 @@ const reloadWatcher = {
   ready: false,
   watcher: null,
 };
+
 export function setupReloadWatcher(electronCapacitorApp: ElectronCapacitorApp): void {
   reloadWatcher.watcher = chokidar
     .watch(join(app.getAppPath(), 'app'), {
@@ -69,7 +70,7 @@ export class ElectronCapacitorApp {
   constructor(
     capacitorFileConfig: CapacitorElectronConfig,
     trayMenuTemplate?: (MenuItemConstructorOptions | MenuItem)[],
-    appMenuBarMenuTemplate?: (MenuItemConstructorOptions | MenuItem)[]
+    appMenuBarMenuTemplate?: (MenuItemConstructorOptions | MenuItem)[],
   ) {
     this.CapacitorFileConfig = capacitorFileConfig;
 
@@ -106,7 +107,7 @@ export class ElectronCapacitorApp {
 
   async init(): Promise<void> {
     const icon = nativeImage.createFromPath(
-      join(app.getAppPath(), 'assets', process.platform === 'win32' ? 'appIcon.ico' : 'appIcon.png')
+      join(app.getAppPath(), 'assets', process.platform === 'win32' ? 'appIcon.ico' : 'appIcon.png'),
     );
     this.mainWindowState = windowStateKeeper({
       defaultWidth: 1000,
@@ -183,7 +184,7 @@ export class ElectronCapacitorApp {
         imageFilePath: join(
           app.getAppPath(),
           'assets',
-          this.CapacitorFileConfig.electron?.splashScreenImageName ?? 'splash.png'
+          this.CapacitorFileConfig.electron?.splashScreenImageName ?? 'splash.png',
         ),
         windowWidth: 400,
         windowHeight: 400,
