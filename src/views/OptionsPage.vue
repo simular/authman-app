@@ -1,30 +1,27 @@
 <script setup lang="ts">
 import icon from '@/assets/images/icon.svg';
 import MainLayout from '@/components/layout/MainLayout.vue';
-import exportService from '@/service/export-service';
-import importService from '@/service/import-service';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
-import { isElectron, noInstantUnlock, userStorage } from '@/store/main-store';
+import { noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
-import { simpleActionSheetConfirm, simpleConfirm } from '@/utilities/alert';
+import { simpleActionSheetConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 import {
-  faDownload,
-  faEnvelope, faFileExport, faFileImport,
   faFingerprint,
   faKey,
   faLock,
   faShareNodes,
-  faSignOut, faUpload, faUserAlt,
+  faSignOut,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonImg, IonItem, IonLabel, IonList, IonNote, IonToggle, useIonRouter } from '@ionic/vue';
 import { watch } from 'vue';
 
+const user = userStorage.value;
 const router = useIonRouter();
-const user = userStorage.value!;
 
 watch(enableBiometricsOption, async (v) => {
   if (v) {
@@ -46,29 +43,21 @@ function lockScreen() {
   router.navigate(
     { name: 'lock' },
     'forward',
-    'push'
+    'push',
   );
-}
-
-async function importAccounts() {
-  await importService.import();
-}
-
-async function exportAccounts() {
-  await exportService.export();
 }
 
 async function share() {
   await Share.share({
     title: 'Authman App',
-    url: import.meta.env.VITE_INFO_WEBSITE
+    url: import.meta.env.VITE_INFO_WEBSITE,
   });
 }
 
 async function logout() {
   const v = await simpleActionSheetConfirm(
     'Do you want to logout?',
-    ['Logout', 'Cancel']
+    ['Logout', 'Cancel'],
   );
 
   if (v) {
@@ -83,9 +72,19 @@ async function logout() {
       <ion-list style="" inset>
         <!-- About -->
         <ion-item button router-link="about">
-          <ion-img :src="icon" slot="start" style="height: 1.5rem; width: 1.5rem;" />
+          <ion-img :src="icon" slot="start"
+            style="height: 1.5rem; width: 1.5rem; margin-inline-end: .7rem; margin-inline-start: -5px" />
           <ion-label>
             About Authman
+          </ion-label>
+        </ion-item>
+
+        <!-- My Account -->
+        <ion-item button router-link="profile">
+          <FontAwesomeIcon :icon="faUser" slot="start" />
+          <ion-label>
+            <h4>My Account</h4>
+            <ion-note>{{ user?.email }}</ion-note>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -118,33 +117,6 @@ async function logout() {
           </FontAwesomeIcon>
           <ion-label>
             Change Password
-          </ion-label>
-        </ion-item>
-      </ion-list>
-
-      <ion-list style="" inset>
-        <!-- Email -->
-        <ion-item>
-          <FontAwesomeIcon :icon="faUserAlt" slot="start" />
-          <ion-label>
-            <h4>My Email</h4>
-            <ion-note>{{ user.email }}</ion-note>
-          </ion-label>
-        </ion-item>
-
-        <!-- Import -->
-        <ion-item button @click="importAccounts">
-          <FontAwesomeIcon :icon="faUpload" slot="start" />
-          <ion-label>
-            Import
-          </ion-label>
-        </ion-item>
-
-        <!-- Export -->
-        <ion-item button @click="exportAccounts">
-          <FontAwesomeIcon :icon="faDownload" slot="start" />
-          <ion-label>
-            Export
           </ion-label>
         </ion-item>
       </ion-list>

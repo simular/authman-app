@@ -172,7 +172,10 @@ export default new class UserService {
           {
             type: 'password',
             name: 'password',
-            id: 'input-password'
+            id: 'input-password',
+            attributes: {
+              autocomplete: 'off'
+            }
           },
         ],
         buttons: [
@@ -187,7 +190,7 @@ export default new class UserService {
         ],
         ...options
       })
-        .then((alert) => {
+        .then(async (alert) => {
           alert.onDidDismiss().then((e) => {
             if (e.role === 'backdrop' || e.role === 'cancel') {
               resolve(false);
@@ -200,10 +203,19 @@ export default new class UserService {
             return e;
           });
 
-          return alert.present();
+          await alert.present();
+
+          return alert;
         })
         .then((alert) => {
-          document.querySelector<HTMLInputElement>('#input-password')?.focus();
+          const input = document.querySelector<HTMLInputElement>('#input-password')!;
+          input.focus();
+          input.addEventListener('keypress', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && input.value !== '') {
+              alert.dismiss();
+              resolve(input.value);
+            }
+          });
 
           return alert;
         });

@@ -53,6 +53,7 @@ async function register() {
     message: 'Your account created.',
     position: 'top',
     duration: 3000,
+    swipeGesture: 'vertical'
   });
   toast.present();
 

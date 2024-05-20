@@ -247,7 +247,9 @@ async function resizeImage(imgDataUri: string) {
         <div style="margin-bottom: .5rem; width: 100%; display: flex; justify-content: center">
           <ion-searchbar autocapitalize="none" v-model="q" placeholder="Search Icon (FontAwesome)"
             color="medium"
-            style="" />
+            style=""
+            @keyup.enter="searchIcon"
+          />
         </div>
 
         <ion-button @click="searchIcon" fill="outline" color="dark"

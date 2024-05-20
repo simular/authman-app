@@ -57,6 +57,11 @@ axios.interceptors.response.use(
       }
     }
 
+    // User not found.
+    if (errCode === 40106) {
+      return userService.logoutAndRedirect();
+    }
+
     const json = e.response?.data;
 
     if (json?.message) {

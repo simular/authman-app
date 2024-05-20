@@ -1,4 +1,10 @@
-import { actionSheetController, alertController, toastController, ToastOptions } from '@ionic/vue';
+import {
+  actionSheetController,
+  ActionSheetOptions,
+  alertController,
+  toastController,
+  ToastOptions,
+} from '@ionic/vue';
 
 export async function simpleAlert(title: any, text?: string, type = 'warning'): Promise<void> {
   if (title instanceof Error || title.message) {
@@ -54,7 +60,11 @@ export async function simpleConfirm(title: string, text?: string): Promise<boole
   });
 }
 
-export async function simpleActionSheetConfirm(title: string, buttons: string[] = []): Promise<boolean> {
+export async function simpleActionSheetConfirm(
+  title: string,
+  buttons: string[] = [],
+  options: Partial<ActionSheetOptions> = {}
+): Promise<boolean> {
   return new Promise((resolve) => {
     const alert = actionSheetController
       .create({
@@ -76,6 +86,7 @@ export async function simpleActionSheetConfirm(title: string, buttons: string[] 
             },
           },
         ],
+        ...options
       });
 
     alert.then((alert) => alert.present());
@@ -86,13 +97,14 @@ export async function simpleToast(
   message: string,
   position: 'top' | 'bottom' | 'middle' = 'bottom',
   duration = 1000,
-  options: ToastOptions = {}
+  options: ToastOptions = {},
 ) {
   const toast = await toastController.create({
     ...options,
     message,
     position,
-    duration
+    duration,
+    swipeGesture: 'vertical',
   });
 
   return toast.present();

@@ -38,12 +38,6 @@ import './theme/main.scss';
 
 currentPlatforms.value = getPlatforms();
 
-console.log(
-  isElectron.value,
-  electronService.getMode(),
-  isElectron.value ? electronService.getMode() : undefined
-);
-
 const app = createApp(App)
   .use(IonicVue, {
     mode: isElectron.value ? electronService.getMode() : undefined
