@@ -10,8 +10,8 @@
     "test:e2e": "cypress run",
     "test:unit": "vitest",
     "lint": "eslint .",
-    "electron": "bin/electron-script.sh",
-    "electron:prod": "bin/electron-script.sh build production",
+    "electron": "sh bin/electron-script.sh",
+    "electron:prod": "sh bin/electron-script.sh build production",
     "resources": "capacitor-resources -p android,ios --transform-splash cover"
   },
   "dependencies": {
