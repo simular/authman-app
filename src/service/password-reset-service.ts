@@ -47,7 +47,7 @@ export default new class {
 
     const saltHex = bigintToHex(salt);
     const saltUint8 = hexToUint8(saltHex);
-    console.log(saltHex, saltUint8);
+
     const kek = await encryptionService.deriveKek(password, saltUint8);
 
     const keyS = S.toString();

@@ -2,6 +2,7 @@ import encryptionService from '@/service/encryption-service';
 import userService from '@/service/user-service';
 import { isElectron, saltStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
+import { wrapUint8 } from '@/utilities/convert';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
 import {
   AndroidBiometryStrength,

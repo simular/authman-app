@@ -10,9 +10,11 @@ import { bigintToHex } from 'bigint-toolkit';
 
 export default new class {
   async deleteMeAndLogout() {
-    await this.deleteMe();
+    const v = await this.deleteMe();
 
-    await userService.logoutAndRedirect();
+    if (v) {
+      await userService.logoutAndRedirect();
+    }
   }
 
   async deleteMe() {
@@ -28,7 +30,7 @@ export default new class {
     );
 
     if (!v) {
-      return;
+      return false;
     }
 
     const password = await userService.askPassword(
@@ -37,19 +39,19 @@ export default new class {
     );
 
     if (!password) {
-      return;
+      return false;
     }
 
     const kek = await localAuthService.validatePasswordAndGetKek(password);
 
     if (!kek) {
       simpleAlert('Invalid password.');
-      return;
+      return false;
     }
 
     const { loading, run } = await useLoadingOverlay('Deleting account...');
 
-    await run(async () => {
+    return await run(async () => {
       const user = userStorage.value!;
       const { salt, B, sess } = await authService.challenge(user.email);
 

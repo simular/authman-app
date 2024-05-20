@@ -1,5 +1,5 @@
 import { uint82text, wrapUint8, } from '@/utilities/convert';
-import { hexToUint8, uint8ToHex } from 'bigint-toolkit';
+import { hexPadZero, hexToUint8, uint8ToHex } from 'bigint-toolkit';
 import sodium, { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers-sumo';
 
 export enum Encoder {
@@ -43,7 +43,7 @@ export default new class {
     const [encoder, encoded] = this.extract(str);
 
     if (encoder === Encoder.HEX) {
-      return hexToUint8(encoded);
+      return hexToUint8(hexPadZero(encoded));
     }
 
     if (encoder === Encoder.BASE64URL) {

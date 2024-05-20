@@ -15,6 +15,7 @@ export default new class EncryptionService {
    */
   async deriveKek(password: Uint8Array | string, salt: Uint8Array | string) {
     password = wrapUint8(password);
+
     salt = wrapUint8(salt);
 
     return sodium.crypto_pwhash(
