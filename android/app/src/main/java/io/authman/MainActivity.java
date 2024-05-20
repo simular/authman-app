@@ -1,4 +1,4 @@
-package com.uniauth.authman;
+package io.authman;
 
 import com.getcapacitor.BridgeActivity;
 
