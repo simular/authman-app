@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import logo from '@/assets/images/icon.svg';
-import { default as vPasswordStrength } from '@/directive/password-strength';
+import vPasswordStrength from '@/directive/v-password-strength';
+import vValidation from '@/directive/v-validation';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
 import { srpClient } from '@/service/srp';
@@ -18,15 +19,23 @@ import {
   toastController,
   useIonRouter,
 } from '@ionic/vue';
-import { ref } from 'vue';
+import { ComponentPublicInstance, ref } from 'vue';
 
 const router = useIonRouter();
 const email = ref(import.meta.env.VITE_TEST_REGISTER_USERNAME || '');
 const password = ref(import.meta.env.VITE_TEST_REGISTER_PASSWORD || '');
 const { loading, run } = useLoading();
 
+const form = ref<HTMLFormElement>();
+
 async function register() {
   const client = srpClient();
+
+  const validity = form.value?.checkValidity();
+
+  if (!validity) {
+    return;
+  }
 
   const result = await run(async () => {
     const { salt, verifier } = await client.register(email.value, password.value);
@@ -76,16 +85,18 @@ async function register() {
           Create a new account
         </h3>
 
-        <div style="width: 85%; display: grid; gap: 1rem;">
+        <form ref="form" style="width: 85%; display: grid; gap: 1rem;">
           <ion-list style="display: grid; gap: 1rem;">
             <ion-item>
               <ion-input label="Email"
+                name="email"
                 type="email"
                 fill="solid"
                 label-placement="stacked"
                 placeholder=""
                 autocomplete="email"
                 v-model="email"
+                v-validation
               >
                 <FontAwesomeIcon :icon="faEnvelope" slot="start" />
               </ion-input>
@@ -122,7 +133,7 @@ async function register() {
               Sign in Now
             </router-link>
           </div>
-        </div>
+        </form>
       </div>
     </ion-content>
   </ion-page>

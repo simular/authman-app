@@ -4,12 +4,18 @@ export default <Directive<HTMLIonInputElement>> {
   async mounted(el, bindings) {
     el.addEventListener('input', onInput);
     el.addEventListener('invalid', onInvalid);
+
+    const input = await el.getInputElement();
+    input.addEventListener('invalid', onInputInvalid);
   },
 
   async unmounted(el) {
     el.removeEventListener('input', onInput);
     el.removeEventListener('invalid', onInvalid);
-  }
+
+    const input = await el.getInputElement();
+    input.removeEventListener('invalid', onInputInvalid);
+  },
 }
 
 function onInput(e: Event) {
@@ -31,4 +37,16 @@ async function onInvalid(e: Event) {
     el.classList.add('ion-invalid');
     el.errorText = input.validationMessage;
   });
+}
+
+async function onInputInvalid(e: Event) {
+  const input = e.currentTarget as HTMLInputElement;
+
+  const ionInput = input.closest<HTMLIonInputElement>('ion-input');
+
+  if (ionInput) {
+    ionInput.dispatchEvent(
+      new CustomEvent('invalid')
+    );
+  }
 }
