@@ -11,7 +11,7 @@ export default <Directive<HTMLIonInputElement>> {
   }
 }
 
-function onInput(e: Event) {
+async function onInput(e: Event) {
   if (import.meta.env.VITE_CHECK_PASSWORD_STRENGTH !== '1') {
     return;
   }
@@ -24,9 +24,12 @@ function onInput(e: Event) {
 
   if (result.score < 3) {
     el.classList.add('ion-invalid');
+    el.errorText = result.feedback.suggestions.join(' ');
   } else {
     el.classList.add('ion-valid');
+    el.errorText = '';
   }
 
-  el.errorText = result.feedback.suggestions.join(' ');
+  const input = await el.getInputElement();
+  input.setCustomValidity(el.errorText);
 }
