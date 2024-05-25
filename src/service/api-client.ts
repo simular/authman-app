@@ -57,8 +57,8 @@ axios.interceptors.response.use(
       }
     }
 
-    // User not found.
-    if (errCode === 40106) {
+    // User not found or force logout.
+    if (errCode === 40106 || errCode === 40102) {
       return userService.logoutAndRedirect();
     }
 
