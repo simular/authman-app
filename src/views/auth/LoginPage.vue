@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo-dark.svg';
+import vValidation from '@/directive/v-validation';
 import authService from '@/service/auth-service';
 import { accessTokenStorage, isLogin, refreshTokenStorage, userStorage } from '@/store/main-store';
 import useLoading from '@/utilities/loading';
@@ -34,7 +35,13 @@ onBeforeRouteLeave((to) => {
   return to.fullPath.startsWith('/auth');
 });
 
+const form = ref<HTMLFormElement>();
+
 async function authenticate() {
+  if (!form.value?.checkValidity()) {
+    return;
+  }
+
   const result = await run(async () => {
     return authService.login(email.value, password.value);
   });
@@ -62,7 +69,7 @@ async function authenticate() {
 
         <h3 style="margin-bottom: 1.5rem">Sign In</h3>
 
-        <div style="width: 85%; display: grid; gap: 1rem;">
+        <form ref="form" style="width: 85%; display: grid; gap: 1rem;">
           <ion-list style="display: grid; gap: 1rem">
             <ion-item>
               <ion-input label="Email"
@@ -72,6 +79,8 @@ async function authenticate() {
                 placeholder="xxx@xxx.xx"
                 autocomplete="email"
                 v-model="email"
+                required
+                v-validation
               >
                 <FontAwesomeIcon :icon="faEnvelope" slot="start" />
               </ion-input>
@@ -85,6 +94,8 @@ async function authenticate() {
                 placeholder="**********"
                 v-model="password"
                 @keyup.enter="authenticate"
+                required
+                v-validation
               >
                 <FontAwesomeIcon :icon="faLock" slot="start" />
               </ion-input>
@@ -107,7 +118,7 @@ async function authenticate() {
           >
             Create an account
           </ion-button>
-        </div>
+        </form>
       </div>
     </ion-content>
   </ion-page>
