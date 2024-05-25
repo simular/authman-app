@@ -1,10 +1,14 @@
 <script setup lang="ts">
 
 import MainLayout from '@/components/layout/MainLayout.vue';
+import apiClient from '@/service/api-client';
 import exportService from '@/service/export-service';
 import importService from '@/service/import-service';
 import userDeleteService from '@/service/user-delete-service';
+import userService from '@/service/user-service';
 import { userStorage } from '@/store/main-store';
+import { simpleConfirm } from '@/utilities/alert';
+import { useLoadingOverlay } from '@/utilities/loading';
 import {
   faDownload,
   faEnvelope,
@@ -28,6 +32,23 @@ async function exportAccounts() {
 async function deleteAccount() {
   await userDeleteService.deleteMeAndLogout();
 }
+
+async function sessionsRefresh() {
+  const v = await simpleConfirm(
+    'This will sign your all devices out.',
+    'You must re-login this device.'
+  );
+
+  if (!v) {
+    return;
+  }
+
+  const { run } = await useLoadingOverlay('Refreshing and Logout...');
+
+  const res = await run(() => apiClient.post('user/sessions/refresh'));
+
+  await userService.logoutAndRedirect();
+}
 </script>
 
 <template>
@@ -46,8 +67,8 @@ async function deleteAccount() {
         </ion-label>
       </ion-item>
 
-      <!-- Expired Tokens -->
-      <ion-item button>
+      <!-- sessions Refresh -->
+      <ion-item button @click="sessionsRefresh">
         <FontAwesomeIcon :icon="faSignOut" slot="start" />
         <ion-label>
           <h4>Sign-Out from All My Devices</h4>
