@@ -5,7 +5,13 @@ import exportService from '@/service/export-service';
 import importService from '@/service/import-service';
 import userDeleteService from '@/service/user-delete-service';
 import { userStorage } from '@/store/main-store';
-import { faDownload, faEnvelope, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faEnvelope,
+  faSignOut,
+  faTrash,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { IonItem, IonLabel, IonList, IonListHeader, IonNote } from '@ionic/vue';
 
@@ -37,6 +43,17 @@ async function deleteAccount() {
         <ion-label>
           <h4>My Email</h4>
           <ion-note>{{ user.email }}</ion-note>
+        </ion-label>
+      </ion-item>
+
+      <!-- Expired Tokens -->
+      <ion-item button>
+        <FontAwesomeIcon :icon="faSignOut" slot="start" />
+        <ion-label>
+          <h4>Sign-Out from All My Devices</h4>
+          <ion-note>
+            Make all session tokens expired, you must re-login again.
+          </ion-note>
         </ion-label>
       </ion-item>
 
