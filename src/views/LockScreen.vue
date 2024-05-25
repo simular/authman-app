@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import logo from '@/assets/images/logo-dark.svg';
-import { default as vDisableSwipeBack } from '@/directive/disable-swipe-back';
+import { default as vDisableSwipeBack } from '@/directive/v-disable-swipe-back';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';

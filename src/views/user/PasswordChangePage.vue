@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
 import MainLayout from '@/components/layout/MainLayout.vue';
-import { default as vPasswordStrength } from '@/directive/password-strength';
-import { default as vValidation } from '@/directive/validation';
+import { default as vPasswordStrength } from '@/directive/v-password-strength';
+import { default as vValidation } from '@/directive/v-validation';
 import authService from '@/service/auth-service';
 import encryptionService from '@/service/encryption-service';
 import passwordResetService from '@/service/password-reset-service';
