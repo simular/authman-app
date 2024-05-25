@@ -42,13 +42,13 @@ export async function simpleConfirm(title: string, text?: string): Promise<boole
         message: text,
         buttons: [
           {
-            text: '取消',
+            text: 'Cancel',
             handler: () => {
               resolve(false);
             },
           },
           {
-            text: '確定',
+            text: 'OK',
             handler: () => {
               resolve(true);
             },
@@ -72,14 +72,14 @@ export async function simpleActionSheetConfirm(
         header: title,
         buttons: [
           {
-            text: buttons[0] || '確定',
+            text: buttons[0] || 'OK',
             role: 'destructive',
             handler: () => {
               resolve(true);
             },
           },
           {
-            text: buttons[1] || '取消',
+            text: buttons[1] || 'Cancel',
             role: 'cancel',
             handler: () => {
               resolve(false);
