@@ -38,13 +38,7 @@ watch(enableBiometricsOption, async (v) => {
 function lockScreen() {
   noInstantUnlock.value = true;
 
-  lockScreenService.handleBeforeLock();
-
-  router.navigate(
-    { name: 'lock' },
-    'forward',
-    'push',
-  );
+  lockScreenService.lock();
 }
 
 async function share() {

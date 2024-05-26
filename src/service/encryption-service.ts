@@ -1,8 +1,10 @@
 import { sodiumCipher } from '@/service/cipher';
+import userService from '@/service/user-service';
 import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
 import { base64UrlDecode, wrapUint8 } from '@/utilities/convert';
 import { hashPbkdf2 } from '@/utilities/crypto';
 import secretToolkit from '@/utilities/secret-toolkit';
+import { sleep } from '@/utilities/timing';
 import { uint8ToHex } from 'bigint-toolkit';
 import sodium from 'libsodium-wrappers-sumo';
 
@@ -53,10 +55,11 @@ export default new class EncryptionService {
       kek = kek || secretToolkit.decode(kekStorage.value);
     } catch (e) {
       console.warn(
-        'Invalid KEK, debug info:',
+        'Invalid KEK, system auto logout',
         kekStorage.value
       );
-      throw new Error('Invalid KEK', { cause: e });
+      userService.logoutAndRedirect();
+      throw e;
     }
 
     const secret = await sodiumCipher.decrypt(base64UrlDecode(encSecretStorage.value), kek);

@@ -1,6 +1,6 @@
-import router from '@/router';
 import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
+import events, { RootNavigationEvent } from '@/service/events';
 import localAuthService from '@/service/local-auth-service';
 import {
   accessTokenStorage,
@@ -18,7 +18,6 @@ import { enableBiometricsOption } from '@/store/options-store';
 import { User } from '@/types';
 import { useLoadingOverlay } from '@/utilities/loading';
 import secretToolkit, { Encoder } from '@/utilities/secret-toolkit';
-import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { headShake } from '@asika32764/vue-animate';
 import { alertController, AlertOptions } from '@ionic/vue';
 import { AxiosError } from 'axios';
@@ -44,7 +43,7 @@ export default new class UserService {
       await this.clearUserSecrets();
     });
 
-    router.replace({ name: 'login' });
+    events.emit(RootNavigationEvent, { name: 'login' }, 'back', 'replace');
   }
 
   async prepareLogin() {

@@ -35,7 +35,10 @@ export const accountsLoaded = useLocalStorage('@authman:accounts.loaded', false,
 export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:accounts', []);
 
 // Lock
-export const isLock = ref(true);
+export const IDLE_TIMEOUT = (Number(import.meta.env.VITE_IDLE_TIMEOUT) || (5 * 60)) * 1000;
+export const idleTimeoutEnabled = IDLE_TIMEOUT > 0;
+export const lockAtStartup = import.meta.env.VITE_LOCK_SCREEN_AT_STARTUP === '1';
+export const isLock = ref(lockAtStartup);
 export const noInstantUnlock = ref(false);
 
 // Platform

@@ -1,11 +1,16 @@
+import events, { LockScreenEvent } from '@/service/events';
 import localAuthService from '@/service/local-auth-service';
 import userService from '@/service/user-service';
-import { isLock, kekStorage, noInstantUnlock } from '@/store/main-store';
+import {
+  isLock,
+  IDLE_TIMEOUT,
+  kekStorage,
+  noInstantUnlock,
+  idleTimeoutEnabled,
+} from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
 import idleTimeout from 'idle-timeout';
-import IdleTimeout from 'idle-timeout/dist/IdleTimeout';
-
-const IDLE_TIMEOUT = (Number(import.meta.env.VITE_IDLE_TIMEOUT) || (5 * 60)) * 1000;
+import type IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
 export default new class {
   idleInstance?: IdleTimeout;
@@ -15,6 +20,12 @@ export default new class {
     kekStorage.value = '';
     const idleInstance = this.getIdleInstance();
     idleInstance.pause();
+  }
+
+  async lock() {
+    await this.handleBeforeLock();
+
+    events.emit(LockScreenEvent);
   }
 
   async unlock() {
@@ -69,7 +80,14 @@ export default new class {
   }
 
   listenIdleTimeout() {
-    this.getIdleInstance();
+    if (!idleTimeoutEnabled) {
+      return;
+    }
+
+    const instance = this.getIdleInstance();
+
+    instance.reset();
+    instance.resume();
   }
 
   getIdleInstance() {
@@ -83,7 +101,7 @@ export default new class {
 
         noInstantUnlock.value = true;
 
-        this.handleBeforeLock();
+        this.lock();
       },
       {
         element: document.body,
