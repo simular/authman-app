@@ -1,9 +1,9 @@
 import electronService from '@/service/electron-service';
 import {
   currentPlatform,
-  currentPlatforms, isElectron,
+  currentPlatforms, idleTimeoutEnabled, isElectron,
   isLogin,
-  isNative,
+  isNative, lockAtStartup,
 } from '@/store/main-store';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Capacitor } from '@capacitor/core';
@@ -50,11 +50,13 @@ router.isReady().then(async () => {
 
   app.mount('#app');
 
-  lockScreenService.listenIdleTimeout();
+  if (idleTimeoutEnabled) {
+    lockScreenService.listenIdleTimeout();
+  }
 
   if (!isLogin.value) {
     router.replace('/auth/login');
-  } else if (import.meta.env.VITE_LOCK_SCREEN_AT_STARTUP === '1') {
+  } else if (lockAtStartup) {
     router.replace('/lock');
   }
 });
