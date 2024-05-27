@@ -79,6 +79,7 @@
       class="account-modal"
       :is-open="accountModalOpen"
       @didDismiss="active = undefined"
+      style="--backdrop-opacity: .75"
     >
       <AccountModalBody v-if="active" :account="active"
         @edit="editAccount(active)"
