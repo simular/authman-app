@@ -92,6 +92,7 @@ async function authenticate() {
                 fill="solid"
                 label-placement="floating"
                 placeholder="**********"
+                autocomplete="current-password"
                 v-model="password"
                 @keyup.enter="authenticate"
                 required
