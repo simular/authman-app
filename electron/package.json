@@ -19,7 +19,7 @@
     "electron:start": "yarn build && electron --inspect=5858 ./",
     "electron:pack": "yarn build && electron-builder build --dir -c ./electron-builder.config.json",
     "electron:make": "yarn build && electron-builder build -c ./electron-builder.config.json -p always",
-    "pack:all": "yarn electron:pack --mac dmg; yarn electron:pack --win portable"
+    "pack:all": "yarn electron:pack --mac dmg; yarn electron:pack"
   },
   "dependencies": {
     "@capacitor-community/electron": "^5.0.0",

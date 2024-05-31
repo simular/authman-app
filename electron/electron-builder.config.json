@@ -20,13 +20,11 @@
   },
   "win": {
     "target": "nsis",
-    "icon": "assets/appIcon.png",
-    "artifactName": "${productName}.${ext}"
+    "icon": "assets/appIcon.png"
   },
   "mac": {
     "category": "your.app.category.type",
     "target": "dmg",
-    "icon": "assets/appIcon.png",
-    "artifactName": "${productName}.${ext}"
+    "icon": "assets/appIcon.png"
   }
 }
