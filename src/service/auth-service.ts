@@ -1,6 +1,7 @@
 import apiClient from '@/service/api-client';
 import { sodiumCipher } from '@/service/cipher';
 import encryptionService from '@/service/encryption-service';
+import lockScreenService from '@/service/lock-screen-service';
 import { srpClient } from '@/service/srp';
 import userService from '@/service/user-service';
 import { accessTokenStorage, kekStorage, refreshTokenStorage } from '@/store/main-store';
@@ -63,6 +64,8 @@ export default new class AuthService {
 
     accessTokenStorage.value = data.accessToken;
     refreshTokenStorage.value = data.refreshToken;
+
+    await lockScreenService.unlock();
 
     return data;
   }

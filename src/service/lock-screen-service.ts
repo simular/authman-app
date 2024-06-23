@@ -6,9 +6,10 @@ import {
   IDLE_TIMEOUT,
   kekStorage,
   noInstantUnlock,
-  idleTimeoutEnabled,
+  idleTimeoutEnabled, isLogin,
 } from '@/store/main-store';
 import { simpleAlert } from '@/utilities/alert';
+import { alertController, modalController } from '@ionic/vue';
 import idleTimeout from 'idle-timeout';
 import type IdleTimeout from 'idle-timeout/dist/IdleTimeout';
 
@@ -18,12 +19,16 @@ export default new class {
   async handleBeforeLock() {
     isLock.value = true;
     kekStorage.value = '';
-    const idleInstance = this.getIdleInstance();
-    idleInstance.pause();
+
+    this.stopListen();
   }
 
   async lock() {
     await this.handleBeforeLock();
+
+    // Dismiss modal and others
+    modalController.dismiss();
+    alertController.dismiss();
 
     events.emit(LockScreenEvent);
   }
@@ -32,9 +37,7 @@ export default new class {
     isLock.value = false;
     noInstantUnlock.value = false;
 
-    const idleInstance = this.getIdleInstance();
-    idleInstance.reset();
-    idleInstance.resume();
+    this.listenIdleTimeout();
   }
 
   async passwordAuthenticate(password: string) {
@@ -84,10 +87,23 @@ export default new class {
       return;
     }
 
-    const instance = this.getIdleInstance();
+    console.log('Listen idle-timeout');
 
-    instance.reset();
-    instance.resume();
+    const idleInstance = this.getIdleInstance();
+    idleInstance.reset();
+    idleInstance.resume();
+  }
+
+  stopListen() {
+    if (!idleTimeoutEnabled) {
+      return;
+    }
+
+    console.log('Stop listen idle-timeout');
+
+    const idleInstance = this.getIdleInstance();
+    idleInstance.reset();
+    idleInstance.resume();
   }
 
   getIdleInstance() {

@@ -2,6 +2,7 @@ import apiClient from '@/service/api-client';
 import authService from '@/service/auth-service';
 import events, { RootNavigationEvent } from '@/service/events';
 import localAuthService from '@/service/local-auth-service';
+import lockScreenService from '@/service/lock-screen-service';
 import {
   accessTokenStorage,
   accountsLoaded,
@@ -41,6 +42,9 @@ export default new class UserService {
 
       // Secrets
       await this.clearUserSecrets();
+
+      // Stop Idle Timeout
+      lockScreenService.stopListen();
     });
 
     events.emit(RootNavigationEvent, { name: 'login' }, 'back', 'replace');
