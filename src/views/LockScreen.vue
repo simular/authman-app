@@ -2,6 +2,8 @@
 
 import logo from '@/assets/images/logo-dark.svg';
 import { default as vDisableSwipeBack } from '@/directive/v-disable-swipe-back';
+import { SecretError } from '@/error/errors';
+import authService from '@/service/auth-service';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
@@ -103,6 +105,24 @@ async function passwordUnlock() {
 
     router.navigate({ name: 'accounts' }, 'back', 'pop');
   } catch (e) {
+    const user = userStorage.value
+
+    // If something missed, re-login again to get keys back
+    if (e instanceof SecretError && user?.email) {
+      try {
+        await run(async () => {
+          await authService.login(user.email!, password.value);
+
+          await lockScreenService.unlock();
+        }, false);
+
+        router.navigate({ name: 'accounts' }, 'back', 'pop');
+        return;
+      } catch (e) {
+        // Nothing, let's outside handle error.
+      }
+    }
+
     passwordInput.value!.$el.classList.add('ion-invalid', 'ion-touched');
 
     headShake(passwordInput.value!.$el);

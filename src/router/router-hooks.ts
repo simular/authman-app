@@ -1,7 +1,11 @@
 import lockScreenService from '@/service/lock-screen-service';
+import { isLock, isLogin } from '@/store/main-store';
 
 export async function pageInit() {
-  console.log('Before');
-  await lockScreenService.routerLock();
-  console.log('After');
+  if (!isLogin.value) {
+    return { name: 'login' };
+  }
+  if (isLock.value) {
+    return { name: 'lock' };
+  }
 }

@@ -1,3 +1,4 @@
+import { SecretError } from '@/error/errors';
 import { uint82text, wrapUint8, } from '@/utilities/convert';
 import { hexPadZero, hexToUint8, uint8ToHex } from 'bigint-toolkit';
 import sodium, { base64_variants, from_base64, to_base64 } from 'libsodium-wrappers-sumo';
@@ -29,7 +30,7 @@ export default new class {
     } else if (encoder === Encoder.BASE64URL) {
       encoded = to_base64(str, base64_variants.URLSAFE_NO_PADDING);
     } else {
-      throw new Error(`Unknown encoder: ${encoder}`);
+      throw new SecretError(`Unknown encoder: ${encoder}`);
     }
 
     if (withPrefix) {
@@ -50,14 +51,14 @@ export default new class {
       return from_base64(str, base64_variants.URLSAFE_NO_PADDING);
     }
 
-    throw new Error(`Unknown encoder: ${encoder}`);
+    throw new SecretError(`Unknown encoder: ${encoder}`);
   }
 
   extract(str: string) {
     const extracted = str.split(':');
 
     if (extracted.length < 2) {
-      throw new Error('Invalid secret string.');
+      throw new SecretError('Invalid secret string.');
     }
 
     return extracted as [string, string];

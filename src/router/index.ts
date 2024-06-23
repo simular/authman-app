@@ -1,3 +1,4 @@
+import { pageInit } from '@/router/router-hooks';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 
@@ -15,6 +16,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/auth/registration',
     name: 'registration',
     component: () => import('@/views/auth/RegistrationPage.vue'),
+    beforeEnter: pageInit,
   },
   {
     path: '/lock',
@@ -24,6 +26,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pages/',
     component: () => import('@/views/MainPage.vue'),
+    beforeEnter: pageInit,
     children: [
       {
         path: '',

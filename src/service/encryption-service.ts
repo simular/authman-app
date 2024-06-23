@@ -1,6 +1,7 @@
 import { sodiumCipher } from '@/service/cipher';
 import userService from '@/service/user-service';
 import { encMasterStorage, encSecretStorage, kekStorage } from '@/store/main-store';
+import { simpleAlert } from '@/utilities/alert';
 import { base64UrlDecode, wrapUint8 } from '@/utilities/convert';
 import { hashPbkdf2 } from '@/utilities/crypto';
 import secretToolkit from '@/utilities/secret-toolkit';
@@ -55,10 +56,10 @@ export default new class EncryptionService {
       kek = kek || secretToolkit.decode(kekStorage.value);
     } catch (e) {
       console.warn(
-        'Invalid KEK, system auto logout',
+        (e as Error).message,
         kekStorage.value
       );
-      userService.logoutAndRedirect();
+      simpleAlert((e as Error).message, 'Try logout and re-login again.');
       throw e;
     }
 

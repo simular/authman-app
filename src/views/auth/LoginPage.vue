@@ -46,12 +46,6 @@ async function authenticate() {
     return authService.login(email.value, password.value);
   });
 
-  const { user, accessToken, refreshToken } = result;
-
-  userStorage.value = user;
-  accessTokenStorage.value = accessToken;
-  refreshTokenStorage.value = refreshToken;
-
   router.replace({
     name: 'accounts',
   });

@@ -13,6 +13,10 @@ export const mainStore = reactive<{
   decryptedAccounts: []
 });
 
+// Env
+export const lockAtStartup = import.meta.env.VITE_LOCK_SCREEN_AT_STARTUP === '1';
+
+// Auth
 export const accessTokenStorage = useStorageAsync('@authman:access.token', '', SecureStorage);
 export const refreshTokenStorage = useStorageAsync('@authman:refresh.token', '', SecureStorage);
 export const userStorage = useLocalStorage<User | null>(
@@ -22,12 +26,13 @@ export const userStorage = useLocalStorage<User | null>(
     serializer: StorageSerializers.object
   }
 );
-export const isLogin = computed(() => accessTokenStorage.value !== '');
+export const isLogin = computed(() => userStorage.value != null);
 
+// Keys
 export const saltStorage = useStorageAsync('@authman:salt', '', SecureStorage);
 export const encSecretStorage = useStorageAsync('@authman:enc.secret', '', SecureStorage);
 export const encMasterStorage = useStorageAsync('@authman:enc.master', '', SecureStorage);
-export const kekStorage = useStorageAsync('@authman:kek', '', SecureStorage);
+export const kekStorage = lockAtStartup ? ref('') : useLocalStorage('@authman:kek', '');
 
 export const accountsLoaded = useLocalStorage('@authman:accounts.loaded', false, {
   serializer: StorageSerializers.boolean
@@ -37,8 +42,7 @@ export const accountsStorage = useLocalStorage<Account<string>[]>('@authman:acco
 // Lock
 export const IDLE_TIMEOUT = (Number(import.meta.env.VITE_IDLE_TIMEOUT) || (5 * 60)) * 1000;
 export const idleTimeoutEnabled = IDLE_TIMEOUT > 0;
-export const lockAtStartup = import.meta.env.VITE_LOCK_SCREEN_AT_STARTUP === '1';
-export const isLock = ref(lockAtStartup);
+export const isLock = ref((lockAtStartup && isLogin.value) || !kekStorage.value);
 export const noInstantUnlock = ref(false);
 
 // Platform

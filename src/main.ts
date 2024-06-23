@@ -54,9 +54,9 @@ router.isReady().then(async () => {
     lockScreenService.listenIdleTimeout();
   }
 
-  if (!isLogin.value) {
-    router.replace('/auth/login');
-  } else if (lockAtStartup) {
-    router.replace('/lock');
-  }
+  // if (!isLogin.value) {
+  //   router.replace('/auth/login');
+  // } else if (lockAtStartup) {
+  //   router.replace('/lock');
+  // }
 });
