@@ -21,12 +21,12 @@
   "win": {
     "target": "nsis",
     "icon": "assets/appIcon.png",
-    "artifactName": "${productName}-macOS.${ext}"
+    "artifactName": "${productName}-Setup-Windows.${ext}"
   },
   "mac": {
     "category": "your.app.category.type",
     "target": "dmg",
     "icon": "assets/appIcon.png",
-    "artifactName": "${productName}-Windows-Setup.${ext}"
+    "artifactName": "${productName}-macOS.${ext}"
   }
 }
