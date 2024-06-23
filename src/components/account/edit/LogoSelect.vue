@@ -18,6 +18,10 @@ enum ImageSource {
   DEFAULT,
 }
 
+const props = defineProps<{
+  preSearch?: string;
+}>();
+
 const logo = defineModel({ default: '' });
 const q = ref('');
 const imageSource = ref(ImageSource.DEFAULT);
@@ -25,12 +29,16 @@ const { loading, run } = useLoading();
 
 onMounted(async () => {
   logo.value = logo.value || await findFontAwesome('key');
+
+  if (props.preSearch) {
+    searchIcon(props.preSearch);
+  }
 });
 
 const emptyImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-async function searchIcon() {
-  const img = await findFontAwesome(q.value);
+async function searchIcon(text?: string) {
+  const img = await findFontAwesome(text || props.preSearch || '');
 
   if (img) {
     logo.value = img;

@@ -14,4 +14,5 @@ export interface AccountContent {
   secret: string;
   image: string;
   url: string;
+  issuer?: string;
 }

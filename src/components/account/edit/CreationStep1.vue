@@ -16,6 +16,7 @@ const secretInput = ref<typeof IonInput>();
 const secret = ref('');
 const title = ref('');
 const host = ref('');
+const issuer = ref('');
 
 onMounted(async () => {
   try {
@@ -33,6 +34,9 @@ onMounted(async () => {
     secretInput.value?.$el.setFocus();
   }, 500);
 });
+
+// Quick test code
+// otpauth://totp/Google:example@gmail.com?secret=JBSWY3DPEHPK3PXP&issuer=Google
 
 async function scanQRCode() {
   await stopScan();
@@ -95,7 +99,7 @@ function decodeTheUri(uri: string) {
   const url = new URL(uri);
 
   if (url.protocol !== 'otpauth:') {
-    simpleAlert('Wrong account URI');
+    simpleAlert('Wrong URI format');
     return;
   }
   
@@ -105,7 +109,12 @@ function decodeTheUri(uri: string) {
 
   host.value = path[0];
   secret.value = url.searchParams.get('secret') || '';
+  issuer.value = url.searchParams.get('issuer') || '';
   title.value = decodeURIComponent(String(path[1])) || '';
+
+  if (issuer.value === '') {
+    issuer.value = String(String(path[1]).split(':').shift());
+  }
 }
 
 const saving = ref(false);
@@ -125,6 +134,7 @@ async function next() {
       secret: secret.value,
       title: title.value,
       host: host.value,
+      issuer: issuer.value,
     },
   );
 
