@@ -15,6 +15,7 @@ const props = defineProps<{
   secret: string;
   title: string;
   host: string;
+  issuer: string;
 }>();
 
 const logo = ref('');
@@ -31,6 +32,7 @@ async function save() {
       secret: props.secret.replace(/\s+/, ''),
       url: props.host,
       image: logo.value,
+      issuer: props.issuer,
     },
     image: '',
     created: dayjs().toISOString(),
@@ -52,13 +54,18 @@ async function save() {
     }, 300);
   });
 }
+
+function simplifyIssuer(issuer: string): string {
+  return issuer.toLowerCase()
+    .replace(/\s+/g, '-');
+}
 </script>
 
 <template>
   <ModalLayout title="Select Logo">
     <div class="box-center ion-padding" style="height: 100%;">
       <div style="width: 85%">
-        <LogoSelect v-model="logo" />
+        <LogoSelect v-model="logo" :pre-search="simplifyIssuer(issuer || '')" />
 
         <div style="margin-top: 2rem">
           <ion-button expand="block" @click="save"
