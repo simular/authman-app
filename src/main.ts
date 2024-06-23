@@ -1,7 +1,7 @@
 import electronService from '@/service/electron-service';
 import {
   currentPlatform,
-  currentPlatforms, idleTimeoutEnabled, isElectron,
+  currentPlatforms, idleTimeoutEnabled, isElectron, isLock,
   isLogin,
   isNative, lockAtStartup,
 } from '@/store/main-store';
@@ -50,7 +50,7 @@ router.isReady().then(async () => {
 
   app.mount('#app');
 
-  if (idleTimeoutEnabled) {
+  if (isLogin.value && !isLock.value) {
     lockScreenService.listenIdleTimeout();
   }
 
