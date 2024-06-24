@@ -35,6 +35,7 @@
     "electron": "^26.2.2",
     "electron-builder": "~23.6.0",
     "electron-rebuild": "^3.2.9",
+    "electron-store": "^8.0",
     "typescript": "^5.0.4"
   },
   "keywords": [
