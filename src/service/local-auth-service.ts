@@ -1,5 +1,6 @@
 import encryptionService from '@/service/encryption-service';
 import userService from '@/service/user-service';
+import { electronSecureStorage } from '@/storage/secure-storage';
 import { isElectron, saltStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { wrapUint8 } from '@/utilities/convert';
@@ -17,13 +18,23 @@ import { Capacitor } from '@capacitor/core';
  * Class to handle local password & biometrics authentication.
  */
 export default new class {
+  secureKekStorageKey = '@authman:secure.kek';
+
   async getKek() {
-    return (await SecureStorage.get('@authman:secure.kek')) as string | null;
+    if (isElectron.value) {
+      return electronSecureStorage.getItem(this.secureKekStorageKey);
+    }
+
+    return (await SecureStorage.get(this.secureKekStorageKey)) as string | null;
   }
 
   async storeKek(kek: string) {
+    if (isElectron.value) {
+      return electronSecureStorage.setItem(this.secureKekStorageKey, kek);
+    }
+
     await SecureStorage.set(
-      '@authman:secure.kek',
+      this.secureKekStorageKey,
       kek,
       undefined,
       false,
@@ -32,7 +43,12 @@ export default new class {
   }
 
   async clearKek() {
-    return SecureStorage.remove('@authman:secure.kek', false);
+    if (isElectron.value) {
+      await electronSecureStorage.removeItem(this.secureKekStorageKey);
+      return true;
+    }
+
+    return SecureStorage.remove(this.secureKekStorageKey, false);
   }
 
   async auth() {

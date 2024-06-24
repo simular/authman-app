@@ -1,4 +1,4 @@
-require('./rt/electron-rt');
+import './rt/electron-rt';
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import { platform } from 'os';
 
@@ -9,6 +9,18 @@ export const ElectronApi = {
 
   promptTouchID(reason: string) {
     return ipcRenderer.invoke('prompt.touch.id', reason);
+  },
+
+  storageSet(key: string, value: string): Promise<Buffer> {
+    return ipcRenderer.invoke('storage.set', key, value);
+  },
+
+  storageGet(key: string): Promise<string> {
+    return ipcRenderer.invoke('storage.get', key);
+  },
+
+  async storageRemove(key: string): Promise<void> {
+    await ipcRenderer.invoke('storage.remove', key);
   },
 };
 

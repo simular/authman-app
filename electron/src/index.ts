@@ -1,11 +1,11 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem, ipcMain, systemPreferences } from 'electron';
+import { app, MenuItem, ipcMain, systemPreferences, safeStorage } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
+import Store from 'electron-store';
 // import { autoUpdater } from 'electron-updater';
-
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -86,4 +86,26 @@ ipcMain.handle('can.prompt.touch.id', (event) => {
 });
 ipcMain.handle('prompt.touch.id', (event, data) => {
   return systemPreferences.promptTouchID(data);
+});
+
+const store = new Store();
+
+ipcMain.handle('storage.set', (event, key, value) => {
+  const enc = safeStorage.encryptString(value);
+
+  return store.set(key, enc.toString('base64url'));
+});
+
+ipcMain.handle('storage.get', (event, key) => {
+  const enc = store.get(key) as string;
+
+  if (!enc) {
+    return enc;
+  }
+
+  return safeStorage.decryptString(Buffer.from(enc, 'base64url'));
+});
+
+ipcMain.handle('storage.remove', (event, key) => {
+  return store.delete(key);
 });

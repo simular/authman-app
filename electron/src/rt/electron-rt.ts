@@ -26,18 +26,18 @@ Object.keys(plugins).forEach((pluginKey) => {
 
       functionList.forEach((functionName) => {
         if (!contextApi[classKey][functionName]) {
-          contextApi[classKey][functionName] = (...args) => ipcRenderer.invoke(`${classKey}-${functionName}`, ...args);
+          contextApi[classKey][functionName] = (...args: any[]) => ipcRenderer.invoke(`${classKey}-${functionName}`, ...args);
         }
       });
 
       // Events
       if (plugins[pluginKey][classKey].prototype instanceof EventEmitter) {
         const listeners: { [key: string]: { type: string; listener: (...args: any[]) => void } } = {};
-        const listenersOfTypeExist = (type) =>
+        const listenersOfTypeExist = (type: string) =>
           !!Object.values(listeners).find((listenerObj) => listenerObj.type === type);
 
         Object.assign(contextApi[classKey], {
-          addListener(type: string, callback: (...args) => void) {
+          addListener(type: string, callback: (...args: any[]) => void) {
             const id = randomId();
 
             // Deduplicate events
@@ -45,7 +45,7 @@ Object.keys(plugins).forEach((pluginKey) => {
               ipcRenderer.send(`event-add-${classKey}`, type);
             }
 
-            const eventHandler = (_, ...args) => callback(...args);
+            const eventHandler = (_: any, ...args: any[]) => callback(...args);
 
             ipcRenderer.addListener(`event-${classKey}-${type}`, eventHandler);
             listeners[id] = { type, listener: eventHandler };
