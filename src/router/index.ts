@@ -16,7 +16,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/auth/registration',
     name: 'registration',
     component: () => import('@/views/auth/RegistrationPage.vue'),
-    beforeEnter: pageInit,
   },
   {
     path: '/lock',
