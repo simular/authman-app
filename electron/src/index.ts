@@ -1,7 +1,7 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem, ipcMain, systemPreferences, safeStorage } from 'electron';
+import { app, MenuItem, ipcMain, systemPreferences, safeStorage, ShareMenu } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import Store from 'electron-store';
@@ -108,4 +108,13 @@ ipcMain.handle('storage.get', (event, key) => {
 
 ipcMain.handle('storage.remove', (event, key) => {
   return store.delete(key);
+});
+
+ipcMain.handle('share', (event, shareItem: { title: string; url: string; }) => {
+  const menu = new ShareMenu({
+    texts: [shareItem.title],
+    urls: [shareItem.url],
+  });
+
+  menu.popup();
 });

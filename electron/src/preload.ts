@@ -22,6 +22,10 @@ export const ElectronApi = {
   async storageRemove(key: string): Promise<void> {
     await ipcRenderer.invoke('storage.remove', key);
   },
+
+  async share(shareItem: { title: string; url: string; }): Promise<void> {
+    await ipcRenderer.invoke('share', shareItem);
+  },
 };
 
 // Expose protected methods that allow the renderer process to use
