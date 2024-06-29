@@ -19,7 +19,12 @@
     "allowToChangeInstallationDirectory": false
   },
   "win": {
-    "target": "nsis",
+    "target": {
+      "target": "nsis",
+      "arch": [
+        "x64"
+      ]
+    },
     "icon": "assets/appIcon.png",
     "artifactName": "${productName}-Setup-Windows.${ext}"
   },
