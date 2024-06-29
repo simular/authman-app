@@ -4,7 +4,7 @@ import MainLayout from '@/components/layout/MainLayout.vue';
 import localAuthService from '@/service/local-auth-service';
 import lockScreenService from '@/service/lock-screen-service';
 import userService from '@/service/user-service';
-import { noInstantUnlock, userStorage } from '@/store/main-store';
+import { isElectron, noInstantUnlock, userStorage } from '@/store/main-store';
 import { enableBiometricsOption } from '@/store/options-store';
 import { simpleActionSheetConfirm } from '@/utilities/alert';
 import { Share } from '@capacitor/share';
@@ -42,10 +42,17 @@ function lockScreen() {
 }
 
 async function share() {
-  await Share.share({
-    title: 'Authman App',
-    url: import.meta.env.VITE_INFO_WEBSITE,
-  });
+  if (isElectron.value) {
+    window.electronApi.share({
+      title: 'Authman 2FA App',
+      url: import.meta.env.VITE_INFO_WEBSITE,
+    });
+  } else {
+    await Share.share({
+      title: 'Authman 2FA App',
+      url: import.meta.env.VITE_INFO_WEBSITE,
+    });
+  }
 }
 
 async function logout() {

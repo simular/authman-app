@@ -19,9 +19,9 @@
     "electron:start": "yarn build && electron --inspect=5858 ./",
     "electron:pack": "yarn build && electron-builder build --dir -c ./electron-builder.config.json",
     "electron:make": "yarn build && electron-builder build -c ./electron-builder.config.json -p always",
-    "pack:all": "yarn electron:pack --mac dmg; yarn electron:pack --win nsis",
+    "pack:all": "yarn electron:pack --mac dmg; yarn electron:pack --win nsis --x64",
     "pack:mac": "yarn electron:pack --mac dmg",
-    "pack:win": "yarn electron:pack --win nsis"
+    "pack:win": "yarn electron:pack --win nsis --x64"
   },
   "dependencies": {
     "@capacitor-community/electron": "^5.0.0",
