@@ -9,3 +9,5 @@ logs
 
 # dev
 *.local
+.env
+notarization_log

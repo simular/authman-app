@@ -32,6 +32,9 @@
     "category": "your.app.category.type",
     "target": "dmg",
     "icon": "assets/appIcon.png",
-    "artifactName": "${productName}-macOS.${ext}"
-  }
+    "artifactName": "${productName}-macOS.${ext}",
+    "hardenedRuntime": true ,
+    "entitlements" : "./node_modules/electron-builder-notarize/entitlements.mac.inherit.plist"
+  },
+  "afterSign" : "electron-builder-notarize"
 }
