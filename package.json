@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "electron": "sh bin/electron-script.sh",
     "electron:prod": "sh bin/electron-script.sh build production",
-    "resources": "capacitor-resources -p android,ios --transform-splash cover"
+    "assets": "npx @capacitor/assets generate --iconBackgroundColor '#001b29' --iconBackgroundColorDark '#001b29' --splashBackgroundColor '#001b29' --splashBackgroundColorDark '#001b29'"
   },
   "dependencies": {
     "@capacitor/android": "5.7.3",
@@ -36,6 +36,7 @@
     "@asika32764/vue-animate": "^3.0.2",
     "@capacitor-community/electron": "^5.0.1",
     "@capacitor-mlkit/barcode-scanning": "^5.4.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "5.7.3",
     "@capacitor/clipboard": "^6.0.0",
     "@capacitor/filesystem": "^6.0.0",
@@ -61,7 +62,6 @@
     "axios": "^1.6.7",
     "axios-url-template": "^1.0.3",
     "bigint-toolkit": "^0.2.0",
-    "capacitor-resources": "^2.0.5",
     "cypress": "^13.5.0",
     "dayjs": "^1.11.10",
     "eslint": "^8.35.0",
