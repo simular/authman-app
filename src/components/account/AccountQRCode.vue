@@ -13,8 +13,9 @@ onMounted(() => {
   const url = props.item.content.url;
   const title = encodeURIComponent(props.item.content.title);
   const secret = props.item.content.secret;
+  const issuer = props.item.content?.issuer || '';
 
-  const uri = `otpauth://${url}/${title}?secret=${secret}`;
+  const uri = `otpauth://${url}/${title}?secret=${secret}&issuer=${issuer}`;
 
   QRCode.toCanvas(canvas.value!, uri);
 });
